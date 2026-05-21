@@ -6,3 +6,4 @@
 - [2026-05-21] Структура .toc: Notes на англ. + ruRU. Библиотеки через lib/load.xml. Патч включает MEMORIES.md.
 - [2026-05-21] Патч 0002: структура ядра KTools — init.lua (AceAddon+RegisterModule+CallModule), core/{settings,minimap,ui}.lua (заглушки), locale/{enUS,ruRU}.lua. lib/load.xml: добавлены AceConfig-3.0, AceLocale-3.0.
 - [2026-05-21] Патч 0003: session-start.sh делает git reset --hard origin/master при старте; .gitignore исключает .claude/patch/. Следующий патч: 0004.
+- [2026-05-21] Патч 0004: settings.json — добавлен permissions.allow: ["Agent"] — исправлен баг блокировки слепого ревью в веб-режиме.
