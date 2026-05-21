@@ -1,0 +1,10 @@
+## Interface: 70300
+## Title: KTools TPH
+## Notes: Farm tracker in units per hour
+## Notes-ruRU: Трекер фарма в единицах за час
+## Author: kawfia
+## Version: 0.1.0
+## Dependencies: KTools
+## SavedVariables: KToolsTPHDB
+
+KToolsTPH.lua
