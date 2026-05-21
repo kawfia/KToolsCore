@@ -1,0 +1,150 @@
+From: Claude <noreply@anthropic.com>
+Date: Thu, 21 May 2026 00:00:00 +0000
+Subject: [new-001] add KTools core structure: init.lua, core stubs, locale stubs
+
+; Скопируй вручную из .claude/reference/lib/ в KTools/lib/:
+;   AceConfig-3.0/  AceLocale-3.0/
+
+---
+ .claude/MEMORIES.md      |  1 +
+ KTools/KTools.toc        |  4 +--
+ KTools/core/load.xml     |  5 ++++
+ KTools/core/minimap.lua  |  1 +
+ KTools/core/settings.lua |  1 +
+ KTools/core/ui.lua       |  1 +
+ KTools/init.lua          | 30 +++++++++++++++++++++
+ KTools/lib/load.xml      |  2 ++
+ KTools/locale/enUS.lua   |  2 ++
+ KTools/locale/load.xml   |  4 ++++
+ KTools/locale/ruRU.lua   |  3 +++
+ 11 files changed, 52 insertions(+), 2 deletions(-)
+
+diff --git a/.claude/MEMORIES.md b/.claude/MEMORIES.md
+index 0983e45..b04d665 100644
+--- a/.claude/MEMORIES.md
++++ b/.claude/MEMORIES.md
+@@ -5,3 +5,4 @@
+ - [2026-05-21] Контейнер read-only для push; git push даёт 403 — патчи доставляются только через SendUserFile.
+ - [2026-05-21] Хук синхронизации: UserPromptSubmit тянет .claude/ из origin/master (не git pull своей ветки).
+ - [2026-05-21] Структура .toc: Notes на англ. + ruRU. Библиотеки через lib/load.xml. Патч включает MEMORIES.md.
++- [2026-05-21] Патч 0002: структура ядра KTools — init.lua (AceAddon+RegisterModule+CallModule), core/{settings,minimap,ui}.lua (заглушки), locale/{enUS,ruRU}.lua. lib/load.xml: добавлены AceConfig-3.0, AceLocale-3.0. Следующий патч: 0003.
+diff --git a/KTools/KTools.toc b/KTools/KTools.toc
+index a3cadb7..d9ce9d0 100644
+--- a/KTools/KTools.toc
++++ b/KTools/KTools.toc
+@@ -7,6 +7,6 @@
+ ## SavedVariables: KToolsDB
+
+ lib\load.xml
+-
+-Modules.lua
+-KTools.lua
++locale\load.xml
++init.lua
++core\load.xml
+diff --git a/KTools/core/load.xml b/KTools/core/load.xml
+index e69de29..5bc521c 100644
+--- a/KTools/core/load.xml
++++ b/KTools/core/load.xml
+@@ -0,0 +1,5 @@
++<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
++    <Script file="settings.lua"/>
++    <Script file="minimap.lua"/>
++    <Script file="ui.lua"/>
++</Ui>
+diff --git a/KTools/core/minimap.lua b/KTools/core/minimap.lua
+new file mode 100644
+index 0000000..9ee3bcd
+--- /dev/null
++++ b/KTools/core/minimap.lua
+@@ -0,0 +1 @@
++-- KTools/core/minimap.lua
+diff --git a/KTools/core/settings.lua b/KTools/core/settings.lua
+new file mode 100644
+index 0000000..b78bfa9
+--- /dev/null
++++ b/KTools/core/settings.lua
+@@ -0,0 +1 @@
++-- KTools/core/settings.lua
+diff --git a/KTools/core/ui.lua b/KTools/core/ui.lua
+new file mode 100644
+index 0000000..57f08d7
+--- /dev/null
++++ b/KTools/core/ui.lua
+@@ -0,0 +1 @@
++-- KTools/core/ui.lua
+diff --git a/KTools/init.lua b/KTools/init.lua
+new file mode 100644
+index 0000000..c76a5fa
+--- /dev/null
++++ b/KTools/init.lua
+@@ -0,0 +1,30 @@
++-- KTools/init.lua
++local ADDON_NAME, KToolsNS = ...
++
++KTools = LibStub("AceAddon-3.0"):NewAddon("KTools", "AceEvent-3.0", "AceConsole-3.0")
++
++KToolsNS.defaults = {
++    profile = {},
++}
++
++function KTools:OnInitialize()
++    self.db = LibStub("AceDB-3.0"):New("KToolsDB", KToolsNS.defaults, true)
++end
++
++function KTools:OnEnable()
++end
++
++local modules = {}
++
++function KTools:RegisterModule(name, module)
++    modules[name] = module
++end
++
++function KTools:CallModule(name, method, ...)
++    local m = modules[name]
++    if not m or not m[method] then return end
++    local ok, err = pcall(m[method], m, ...)
++    if not ok then
++        self:Print("[KTools] Error in " .. name .. ": " .. tostring(err))
++    end
++end
+diff --git a/KTools/lib/load.xml b/KTools/lib/load.xml
+index cf8f49f..6eb644d 100644
+--- a/KTools/lib/load.xml
++++ b/KTools/lib/load.xml
+@@ -6,6 +6,8 @@
+     <Script file="AceConsole-3.0\AceConsole-3.0.lua"/>
+     <Script file="AceDB-3.0\AceDB-3.0.lua"/>
+     <Include file="AceGUI-3.0\AceGUI-3.0.xml"/>
++    <Include file="AceConfig-3.0\AceConfig-3.0.xml"/>
++    <Include file="AceLocale-3.0\AceLocale-3.0.xml"/>
+     <Script file="LibDataBroker-1.1\LibDataBroker-1.1.lua"/>
+     <Include file="LibDBIcon-1.0\lib.xml"/>
+     <Script file="LibWindow-1.1\LibWindow-1.1.lua"/>
+diff --git a/KTools/locale/enUS.lua b/KTools/locale/enUS.lua
+new file mode 100644
+index 0000000..ef25a1f
+--- /dev/null
++++ b/KTools/locale/enUS.lua
+@@ -0,0 +1,2 @@
++-- KTools/locale/enUS.lua
++local L = LibStub("AceLocale-3.0"):NewLocale("KTools", "enUS", true)
+diff --git a/KTools/locale/load.xml b/KTools/locale/load.xml
+index e69de29..998a51b 100644
+--- a/KTools/locale/load.xml
++++ b/KTools/locale/load.xml
+@@ -0,0 +1,4 @@
++<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
++    <Script file="enUS.lua"/>
++    <Script file="ruRU.lua"/>
++</Ui>
+diff --git a/KTools/locale/ruRU.lua b/KTools/locale/ruRU.lua
+new file mode 100644
+index 0000000..bca5d06
+--- /dev/null
++++ b/KTools/locale/ruRU.lua
+@@ -0,0 +1,3 @@
++-- KTools/locale/ruRU.lua
++local L = LibStub("AceLocale-3.0"):NewLocale("KTools", "ruRU")
++if not L then return end
