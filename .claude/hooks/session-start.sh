@@ -2,6 +2,11 @@
 DIR="${CLAUDE_PROJECT_DIR:-.}"
 PATCH_DIR="$DIR/.claude/patch"
 
+# Sync from user's remote master branch at session start
+cd "$DIR" || exit 0
+git fetch origin --quiet 2>/dev/null
+git reset --hard origin/master --quiet 2>/dev/null || true
+
 cat "$DIR/.claude/MEMORIES.md" 2>/dev/null
 
 # Последний handoff
