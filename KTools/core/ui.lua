@@ -1,6 +1,7 @@
 -- KTools/core/ui.lua
-local KTools = LibStub("AceAddon-3.0"):GetAddon("KTools")
-local L = LibStub("AceLocale-3.0"):GetLocale("KTools")
+local ADDON = ...
+local KTools = LibStub("AceAddon-3.0"):GetAddon(ADDON)
+local L = LibStub("AceLocale-3.0"):GetLocale(ADDON)
 local AceGUI = LibStub("AceGUI-3.0")
 local LibWindow = LibStub("LibWindow-1.1")
 
@@ -56,7 +57,7 @@ function KTools:ShowMainFrame()
     local win = self.db.profile.window
 
     mainFrame = AceGUI:Create("Frame")
-    mainFrame:SetTitle(L["KTools"])
+    mainFrame:SetTitle(ADDON)
     mainFrame:SetLayout("Fill")
     mainFrame:SetWidth(win.width)
     mainFrame:SetHeight(win.height)
