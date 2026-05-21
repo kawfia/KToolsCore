@@ -7,6 +7,6 @@
 ## SavedVariables: KToolsDB
 
 lib\load.xml
-
-Modules.lua
-KTools.lua
+locale\load.xml
+init.lua
+core\load.xml

@@ -1,0 +1,1 @@
+-- KTools/core/settings.lua
