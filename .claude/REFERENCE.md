@@ -10,6 +10,7 @@
 |---|---|
 | `.claude/rules/red-lines.md` | Абсолютные запреты — читать обязательно |
 | `.claude/rules/architecture.md` | Архитектура, структура проекта, библиотеки |
+| `.claude/rules/common-mistakes.md` | Частые ошибки которые были при генерации кода |
 
 ---
 
