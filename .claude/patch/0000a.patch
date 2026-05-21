@@ -1,0 +1,39 @@
+From: Claude <noreply@anthropic.com>
+Date: Wed, 21 May 2026 00:00:00 +0000
+Subject: [ref-000] add blind review and patch delivery steps; init MEMORIES.md
+
+---
+ .claude/CLAUDE.md   | 10 ++++++++++
+ .claude/MEMORIES.md |  5 +++++
+ 2 files changed, 15 insertions(+)
+
+diff --git a/.claude/CLAUDE.md b/.claude/CLAUDE.md
+--- a/.claude/CLAUDE.md
++++ b/.claude/CLAUDE.md
+@@ -17,6 +17,16 @@
+ **Нумерация патчей**: код — 0001,0002; минорные — 0001a,0001b
+ **Теги коммитов в названии**: [todo-000], [new-000], [ref-000], [bug-000]
+
++## После создания патча:
++1. **Слепой ревью**: вызвать Agent со следующим контекстом:
++   - содержимое патча
++   - `.claude/rules/red-lines.md`
++   - `.claude/rules/architecture.md`
++   - `.claude/REFERENCE.md`
++   - **не передавать** описание задачи — агент проверяет только соответствие правилам
++   - вернуть: список нарушений или `LGTM`
++2. **Доставка**: отправить `.patch` файл через `SendUserFile`
++
+ ## Финал ответа:
+ **MEMORIES.md**: Кратко изложить пользователю что добавить, что удалить.
+ **Скользящее окно**: 5-7 событий.
+
+diff --git a/.claude/MEMORIES.md b/.claude/MEMORIES.md
+--- a/.claude/MEMORIES.md
++++ b/.claude/MEMORIES.md
+@@ -0,0 +1,5 @@
++# MEMORIES
++
++- [2026-05-21] Предложена базовая структура KTools (ожидает подтверждения): KTools.lua + Modules.lua, lib: LibStub→AceAddon/Event/Console/DB/GUI + LibDataBroker/DBIcon/Window, публичный API: RegisterModule, CallModule, ToggleMainFrame, KToolsDB.
++- [2026-05-21] Утверждён рабочий процесс: после каждого патча — слепой ревью через Agent (без контекста задачи) + доставка через SendUserFile.
++- [2026-05-21] Контейнер read-only для push; git push даёт 403 — патчи доставляются только через SendUserFile.

@@ -1,0 +1,30 @@
+From: Claude <noreply@anthropic.com>
+Date: Thu, 21 May 2026 00:00:00 +0000
+Subject: [bug-004] fix Agent tool permission blocking blind review
+
+---
+ .claude/MEMORIES.md   | 1 +
+ .claude/settings.json | 4 ++++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/.claude/MEMORIES.md b/.claude/MEMORIES.md
+index fb3964e..51be962 100644
+--- a/.claude/MEMORIES.md
++++ b/.claude/MEMORIES.md
+@@ -6,3 +6,4 @@
+ - [2026-05-21] Структура .toc: Notes на англ. + ruRU. Библиотеки через lib/load.xml. Патч включает MEMORIES.md.
+ - [2026-05-21] Патч 0002: структура ядра KTools — init.lua (AceAddon+RegisterModule+CallModule), core/{settings,minimap,ui}.lua (заглушки), locale/{enUS,ruRU}.lua. lib/load.xml: добавлены AceConfig-3.0, AceLocale-3.0.
+ - [2026-05-21] Патч 0003: session-start.sh делает git reset --hard origin/master при старте; .gitignore исключает .claude/patch/. Следующий патч: 0004.
++- [2026-05-21] Патч 0004: settings.json — добавлен permissions.allow: ["Agent"] — исправлен баг блокировки слепого ревью в веб-режиме.
+diff --git a/.claude/settings.json b/.claude/settings.json
+index 09f781c..cd44a7b 100644
+--- a/.claude/settings.json
++++ b/.claude/settings.json
+@@ -1,4 +1,7 @@
+ {
++  "permissions": {
++    "allow": ["Agent"]
++  },
+   "hooks": {
+     "SessionStart": [
+       {
