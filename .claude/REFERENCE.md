@@ -19,7 +19,7 @@
 
 | Файл | Модуль | Команда | Статус |
 |---|---|---|---|
-| `.claude/tasks/KTools.md` | Ядро | `/ktools` | Ожидает options.lua |
+| `.claude/tasks/KTools.md` | Ядро | `/ktools` | Активно |
 | `.claude/tasks/KToolsAutoLoot.md` | Авто-лут | `/ktloot` | В разработке |
 | `.claude/tasks/KToolsTPH.md` | Трекер фарма | `/ktph` | Идея |
 
@@ -30,9 +30,10 @@
 | Файл | Паттерн |
 |---|---|
 | `KTools/init.lua` | AceAddon:NewAddon, AceDB:New, slash-команды, defaults inline |
-| `KTools/core/ui.lua` | RegisterModule, SafeCall, AceGUI Frame+TabGroup, LibWindow позиция |
+| `KTools/core/ui.lua` | RegisterModule, SafeCall, AceGUI Frame+TreeGroup, LibWindow позиция |
 | `KTools/core/minimap.lua` | LDB:NewDataObject, LibDBIcon:Register, Show/Hide через KTools-метод |
 | `KTools/core/options.lua` | AceConfig-3.0 options table, RegisterOptionsTable, AddToBlizOptions |
+| `.claude/reference/addons/ElvUI_Config/profiles.lua` | Управление профилями AceDB: выбор / создать / удалить, импорт/экспорт через AceSerializer-3.0 + LibDeflate |
 
 ---
 
@@ -44,7 +45,7 @@
 | `.claude/reference/autoloot_customlist.html` | Макет пользовательского списка предметов |
 | `.claude/reference/core.h` | ItemClass, ItemBonding, InventoryType (Legion 7.3.5) |
 | `.claude/reference/lib/` | Библиотеки (не коммитятся, копировать вручную) |
-| `.claude/reference/addons/` | Референсные аддоны |
-```
+| `.claude/reference/addons/ElvUI_Config/profiles.lua` | Профили AceDB: Dropdown выбора, Создать, Удалить + интерактивное окно импорт/экспорт (AceSerializer-3.0 + LibDeflate) |
+| `.claude/reference/addons/` | Прочие референсные аддоны |
 
 ---

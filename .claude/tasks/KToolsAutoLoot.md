@@ -16,6 +16,7 @@
 | Без подтверждения BoP | Автоподтверждение диалога привязки при подборе BoP |
 | Закрыть лут при скиннинге | Закрыть окно лута при касте снятия шкур |
 | Мгновенное закрытие пустого лута | Закрыть окно лута сразу если оно пустое |
+| Авто-открытие контейнеров | Автоматически открывать лутабельные контейнеры в сумках |
 
 ## Интерфейс
 Модуль рендерит UI внутри фрейма-контейнера KTools (передаётся через `KTools:RegisterModule`). Собственного окна нет.
@@ -77,7 +78,7 @@ BoE — BoE (bindType=2), не привязан (bindType=0). BoP — тольк
 | checkbox | checkbox | Включить/выключить запись |
 | (diamond) | icon | Ромб цвета качества предмета (автозаполнение) |
 | ID | input | Поле ввода itemID |
-| Название предмета | text | Автозаполняется по ID |
+| Название предмета | text | Автозаполняется по ID, окрашено в цвет качества |
 | ilvl >= | input | Минимальный ilvl (опционально) |
 | (удалить) | button (x) | Удалить запись |
 
@@ -89,8 +90,8 @@ KToolsAutoloot/
   core/
     load.xml               — список core-файлов
     engine.lua             — движок лута: события, фильтрация, LootSlot, tooltip-scan, импорт/экспорт
-    settings.lua           — схема SavedVariables
     options.lua            — AceConfig-подменю (ESC → KTools → AutoLoot)
+    profiles.lua           - Логика профилей.
   ui/
     load.xml               — список UI-файлов
     main.lua               — шапка: включить, профиль, кнопки управления
@@ -107,17 +108,32 @@ KToolsAutoloot/
 
 ## SavedVariables
 Хранятся в профилях AceDB под ключом `KToolsAutolootDB`.
+Схема дефолтов объявлена inline в `init.lua` в таблице `defaults` — отдельный файл settings.lua не используется.
 
 Каждый профиль содержит:
 - `enabled` — включён ли модуль
 - `categories` — быстрые категории (золото, реагенты и т.д.)
 - `quality` — матрица качество × привязка × ilvl
 - `customList` — список предметов пользователя (id → {enabled, ilvl})
-- `options` — особые опции (bop, skinning, emptyLoot)
+- `options` — особые опции (bop, skinning, emptyLoot, autoOpen)
 
-Импорт/Экспорт профиля — паттерн ElvUI:
-`AceSerializer:Serialize` → `LibDeflate:CompressDeflate` → base64-строка.
+## Профили и Импорт/Экспорт
+
+
 > Reference: `.claude/reference/addons/ElvUI_Config/profiles.lua`
+
+**Элементы шапки** (`ui/main.lua`):
+- Dropdown выбора → `AutoLoot.db:SetProfile(name)`, список через `AutoLoot.db:GetProfiles()`
+- Кнопка «Создать» → `AutoLoot.db:SetProfile(newName)` (AceDB создаёт при первом обращении)
+- Dropdown «Удалить» → `AutoLoot.db:DeleteProfile(name)`
+- Кнопка «Импорт» → открывает интерактивное окно (AceGUI Frame + MultiLineEditBox) для вставки строки
+- Кнопка «Экспорт» → открывает интерактивное окно с готовой строкой для копирования
+
+**Сериализация** (`core/engine.lua`):
+`AutoLoot.db.profile` → `AceSerializer:Serialize` → `LibDeflate:CompressDeflate` → `LibDeflate:EncodeForPrint` → строка.
+
+**Библиотеки**: AceSerializer-3.0 и LibDeflate добавляются в `KTools/lib/` — доступны всем модулям автоматически.
+Дополнительных методов в KTools не требуется — вся логика реализуется в KToolsAutoLoot.
 
 ## WoW API (Legion 7.3.5)
 
@@ -160,11 +176,12 @@ LOOT_READY:
   подписаться на LOOT_OPENED (один раз)
 
 LOOT_OPENED:
+  UnregisterEvent("LOOT_OPENED")   -- первой строкой, до CloseLoot
   n = GetNumLootItems()
   если n == 0 и опция emptyLoot включена: CloseLoot(); выйти
   для i = n .. 1:        -- обратный порядок: LootSlot сдвигает индексы
     если ShouldLoot(i): LootSlot(i)
-  отписаться от LOOT_OPENED
+  -- WoW закрывает окно сам после полного лута
 ```
 
 > Reference паттерн: `.claude/reference/addons/ExRT/LootLink.lua`
@@ -208,14 +225,14 @@ LOOT_OPENED:
 ### В порядке очереди
 | Этап | Файлы |
 |---|---|
-| Скелет | toc, init.lua, locale/*, load.xml |
-| UI | ui/main.lua, quick.lua, custom.lua |
-| Движок лута | core/engine.lua |
-| Опции AceConfig | core/options.lua |
-| Импорт/Экспорт | core/engine.lua (Serialize/Deserialize) |
+| Скелет ✓ | toc, init.lua, locale/*, load.xml |
+| UI ✓ | ui/main.lua, quick.lua, custom.lua |
+| Движок лута ✓ | core/engine.lua |
+| Опции AceConfig ✓ | core/options.lua |
+| Профили | ui/main.lua (логика dropdown/кнопок) |
+| Импорт/Экспорт | core/engine.lua (Serialize/Deserialize), ui/main.lua (окно) |
 
 ### Параллельно наполняя
 | Этап | Файлы |
 |---|---|
-| SavedVariables | core/settings.lua |
 | Локализация (финал) | locale/enUS.lua, ruRU.lua |
