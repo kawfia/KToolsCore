@@ -1,6 +1,5 @@
 [2026-05-21] core/ui.lua реализован: ADDON=..., RegisterModule, SafeCall, ShowMainFrame/Hide/Toggle, LibWindow-1.1 для позиции, AceGUI Frame+TabGroup.
-[2026-05-21] lib/load.xml: добавлен LibWindow-1.1. KTools.toc: версия → 0.1.2.
 [2026-05-21] init.lua реализован: AceAddon:NewAddon, AceDB:New("KToolsDB"), slash /ktools /ktl → ToggleMainFrame.
-[2026-05-21] core/settings.lua реализован: defaults profile.window{width=600,height=450,point,x,y,scale}, minimap{hide}.
-[2026-05-21] core/minimap.lua реализован: LDB:NewDataObject + LibDBIcon:Register, db=profile.minimap, OnClick→ToggleMainFrame. locale: MINIMAP_HINT. Версия → 0.1.4.
+[2026-05-21] core/minimap.lua реализован: LDB:NewDataObject + LibDBIcon:Register, db=profile.minimap, OnClick→ToggleMainFrame. Версия → 0.1.4.
 [2026-05-22] KToolsAutoLoot скелет реализован: toc v0.1.1, init.lua (AceAddon+AceConsole+AceEvent, AceDB "KToolsAutolootDB", RegisterModule, /ktloot), locale/*, core/load.xml и ui/load.xml (скаффолд). Draw() — заглушка.
+[2026-05-22] KToolsAutoLoot UI этап 2: toc v0.1.2, init.lua расширен (defaults: categories, quality[0..5]), locale en/ru (29 ключей), ui/main.lua (Draw, шапка, switchBtn), ui/quick.lua (DrawQuickSettings, 8 кат. + 6 строк качества), ui/custom.lua (DrawCustomList заглушка).

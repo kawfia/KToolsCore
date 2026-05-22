@@ -5,7 +5,25 @@ _G[ADDON] = AutoLoot
 
 local defaults = {
     profile = {
-        enabled = false,
+        enabled = true,
+        categories = {
+            gold     = true,
+            reagents = true,
+            recipes  = false,
+            mounts   = true,
+            pets     = false,
+            quest    = true,
+            currency = true,
+            artifact = true,
+        },
+        quality = {
+            [0] = { enabled = false, nob = true, boe = true, bop = true, ilvl = 0 },
+            [1] = { enabled = false, nob = true, boe = true, bop = true, ilvl = 0 },
+            [2] = { enabled = false, nob = true, boe = true, bop = true, ilvl = 0 },
+            [3] = { enabled = false, nob = true, boe = true, bop = true, ilvl = 0 },
+            [4] = { enabled = false, nob = true, boe = true, bop = true, ilvl = 0 },
+            [5] = { enabled = false, nob = true, boe = true, bop = true, ilvl = 0 },
+        },
     },
 }
 
