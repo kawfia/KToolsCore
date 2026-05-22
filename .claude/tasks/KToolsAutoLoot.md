@@ -198,12 +198,17 @@ LOOT_OPENED:
 
 ## План разработки
 
-| Этап | Файлы | Версия |
-|---|---|---|
-| Скелет | toc, init.lua, locale/*, load.xml | 0.1.0 |
-| SavedVariables | core/settings.lua | 0.1.1 |
-| Движок лута | core/engine.lua | 0.1.2–0.1.6 |
-| UI | ui/main.lua, quick.lua, custom.lua | 0.1.7–0.1.9 |
-| Импорт/Экспорт | core/engine.lua (Serialize/Deserialize) | 0.2.0 |
-| Опции AceConfig | core/options.lua | 0.2.1 |
-| Локализация (финал) | locale/enUS.lua, ruRU.lua | 0.2.2 |
+### В порядке очереди
+| Этап | Файлы |
+|---|---|
+| Скелет | toc, init.lua, locale/*, load.xml |
+| UI | ui/main.lua, quick.lua, custom.lua |
+| Движок лута | core/engine.lua |
+| Опции AceConfig | core/options.lua |
+| Импорт/Экспорт | core/engine.lua (Serialize/Deserialize) |
+
+### Параллельно наполняя
+| Этап | Файлы |
+|---|---|
+| SavedVariables | core/settings.lua |
+| Локализация (финал) | locale/enUS.lua, ruRU.lua |
