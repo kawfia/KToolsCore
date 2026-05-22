@@ -11,54 +11,32 @@ function AutoLoot:Draw(container)
     currentView = "quick"
 
     local header = AceGUI:Create("SimpleGroup")
-    header:SetLayout("Flow")
+    header:SetLayout("List")
     header:SetFullWidth(true)
     container:AddChild(header)
 
     local content = AceGUI:Create("SimpleGroup")
-    content:SetLayout("Flow")
+    content:SetLayout("List")
     content:SetFullWidth(true)
     container:AddChild(content)
+
+    local topRow = AceGUI:Create("SimpleGroup")
+    topRow:SetLayout("Flow")
+    topRow:SetFullWidth(true)
+    header:AddChild(topRow)
 
     local enabledChk = AceGUI:Create("CheckBox")
     enabledChk:SetLabel(L["ENABLED"])
     enabledChk:SetValue(AutoLoot.db.profile.enabled)
-    enabledChk:SetWidth(130)
+    enabledChk:SetRelativeWidth(0.65)
     enabledChk:SetCallback("OnValueChanged", function(_, _, val)
         AutoLoot.db.profile.enabled = val
     end)
-    header:AddChild(enabledChk)
-
-    local profileDrop = AceGUI:Create("Dropdown")
-    profileDrop:SetLabel(L["PROFILE"])
-    profileDrop:SetWidth(120)
-    profileDrop:SetList({})
-    header:AddChild(profileDrop)
-
-    local createBtn = AceGUI:Create("Button")
-    createBtn:SetText(L["PROFILE_CREATE"])
-    createBtn:SetWidth(80)
-    header:AddChild(createBtn)
-
-    local deleteDrop = AceGUI:Create("Dropdown")
-    deleteDrop:SetLabel(L["PROFILE_DELETE"])
-    deleteDrop:SetWidth(120)
-    deleteDrop:SetList({})
-    header:AddChild(deleteDrop)
-
-    local importBtn = AceGUI:Create("Button")
-    importBtn:SetText(L["IMPORT"])
-    importBtn:SetWidth(80)
-    header:AddChild(importBtn)
-
-    local exportBtn = AceGUI:Create("Button")
-    exportBtn:SetText(L["EXPORT"])
-    exportBtn:SetWidth(80)
-    header:AddChild(exportBtn)
+    topRow:AddChild(enabledChk)
 
     local switchBtn = AceGUI:Create("Button")
     switchBtn:SetText(L["VIEW_CUSTOM"])
-    switchBtn:SetWidth(160)
+    switchBtn:SetRelativeWidth(0.35)
     switchBtn:SetCallback("OnClick", function()
         content:ReleaseChildren()
         if currentView == "quick" then
@@ -71,7 +49,44 @@ function AutoLoot:Draw(container)
             AutoLoot:DrawQuickSettings(content)
         end
     end)
-    header:AddChild(switchBtn)
+    topRow:AddChild(switchBtn)
+
+    local bottomRow = AceGUI:Create("SimpleGroup")
+    bottomRow:SetLayout("Flow")
+    bottomRow:SetFullWidth(true)
+    header:AddChild(bottomRow)
+
+    local profileDrop = AceGUI:Create("Dropdown")
+    profileDrop:SetLabel(L["PROFILE"])
+    profileDrop:SetWidth(120)
+    profileDrop:SetList({})
+    bottomRow:AddChild(profileDrop)
+
+    local createBtn = AceGUI:Create("Button")
+    createBtn:SetText(L["PROFILE_CREATE"])
+    createBtn:SetWidth(80)
+    bottomRow:AddChild(createBtn)
+
+    local deleteDrop = AceGUI:Create("Dropdown")
+    deleteDrop:SetLabel(L["PROFILE_DELETE"])
+    deleteDrop:SetWidth(120)
+    deleteDrop:SetList({})
+    bottomRow:AddChild(deleteDrop)
+
+    local spacer = AceGUI:Create("Label")
+    spacer:SetText(" ")
+    spacer:SetRelativeWidth(0.35)
+    bottomRow:AddChild(spacer)
+
+    local importBtn = AceGUI:Create("Button")
+    importBtn:SetText(L["IMPORT"])
+    importBtn:SetWidth(90)
+    bottomRow:AddChild(importBtn)
+
+    local exportBtn = AceGUI:Create("Button")
+    exportBtn:SetText(L["EXPORT"])
+    exportBtn:SetWidth(90)
+    bottomRow:AddChild(exportBtn)
 
     AutoLoot:DrawQuickSettings(content)
 end

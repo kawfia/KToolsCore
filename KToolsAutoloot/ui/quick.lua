@@ -4,15 +4,18 @@ local AutoLoot = LibStub("AceAddon-3.0"):GetAddon(ADDON)
 local AceGUI = LibStub("AceGUI-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale(ADDON)
 
-local CATEGORIES = {
-    { key = "gold",     label = "CATEGORY_GOLD" },
+local CATEGORIES_LEFT = {
     { key = "reagents", label = "CATEGORY_REAGENTS" },
     { key = "recipes",  label = "CATEGORY_RECIPES" },
     { key = "mounts",   label = "CATEGORY_MOUNTS" },
     { key = "pets",     label = "CATEGORY_PETS" },
-    { key = "quest",    label = "CATEGORY_QUEST" },
+}
+
+local CATEGORIES_RIGHT = {
+    { key = "gold",     label = "CATEGORY_GOLD" },
     { key = "currency", label = "CATEGORY_CURRENCY" },
     { key = "artifact", label = "CATEGORY_ARTIFACT" },
+    { key = "quest",    label = "CATEGORY_QUEST" },
 }
 
 local QUALITIES = {
@@ -24,11 +27,23 @@ local QUALITIES = {
     { q = 5, color = "|cffff8000", name = "QUALITY_LEGENDARY" },
 }
 
-local BINDS = {
-    { key = "nob", label = "BIND_NOB" },
-    { key = "boe", label = "BIND_BOE" },
-    { key = "bop", label = "BIND_BOP" },
-}
+local function addCategoryColumn(parent, cats, list)
+    local col = AceGUI:Create("SimpleGroup")
+    col:SetLayout("List")
+    col:SetRelativeWidth(0.5)
+    parent:AddChild(col)
+    for _, cat in ipairs(list) do
+        local key = cat.key
+        local chk = AceGUI:Create("CheckBox")
+        chk:SetLabel(L[cat.label])
+        chk:SetValue(cats[key])
+        chk:SetFullWidth(true)
+        chk:SetCallback("OnValueChanged", function(_, _, val)
+            cats[key] = val
+        end)
+        col:AddChild(chk)
+    end
+end
 
 function AutoLoot:DrawQuickSettings(container)
     local catGroup = AceGUI:Create("InlineGroup")
@@ -38,23 +53,39 @@ function AutoLoot:DrawQuickSettings(container)
     container:AddChild(catGroup)
 
     local cats = AutoLoot.db.profile.categories
-    for _, cat in ipairs(CATEGORIES) do
-        local key = cat.key
-        local chk = AceGUI:Create("CheckBox")
-        chk:SetLabel(L[cat.label])
-        chk:SetValue(cats[key])
-        chk:SetWidth(160)
-        chk:SetCallback("OnValueChanged", function(_, _, val)
-            cats[key] = val
-        end)
-        catGroup:AddChild(chk)
-    end
+    addCategoryColumn(catGroup, cats, CATEGORIES_LEFT)
+    addCategoryColumn(catGroup, cats, CATEGORIES_RIGHT)
 
     local qualGroup = AceGUI:Create("InlineGroup")
     qualGroup:SetTitle(L["QUALITY_FILTER"])
     qualGroup:SetLayout("List")
     qualGroup:SetFullWidth(true)
     container:AddChild(qualGroup)
+
+    local headerRow = AceGUI:Create("SimpleGroup")
+    headerRow:SetLayout("Flow")
+    headerRow:SetFullWidth(true)
+    qualGroup:AddChild(headerRow)
+
+    local hEnabled = AceGUI:Create("Label")
+    hEnabled:SetText(L["QF_HDR_ENABLED"])
+    hEnabled:SetWidth(195)
+    headerRow:AddChild(hEnabled)
+
+    local hIlvl = AceGUI:Create("Label")
+    hIlvl:SetText(L["QF_HDR_ILVL"])
+    hIlvl:SetWidth(90)
+    headerRow:AddChild(hIlvl)
+
+    local hBoe = AceGUI:Create("Label")
+    hBoe:SetText(L["QF_HDR_BOE"])
+    hBoe:SetWidth(75)
+    headerRow:AddChild(hBoe)
+
+    local hBop = AceGUI:Create("Label")
+    hBop:SetText(L["QF_HDR_BOP"])
+    hBop:SetWidth(75)
+    headerRow:AddChild(hBop)
 
     local qdb = AutoLoot.db.profile.quality
     for _, info in ipairs(QUALITIES) do
@@ -65,35 +96,46 @@ function AutoLoot:DrawQuickSettings(container)
         row:SetFullWidth(true)
         qualGroup:AddChild(row)
 
-        local rowChk = AceGUI:Create("CheckBox")
-        rowChk:SetLabel(info.color .. L[info.name] .. "|r")
-        rowChk:SetValue(qdb[q].enabled)
-        rowChk:SetWidth(130)
-        rowChk:SetCallback("OnValueChanged", function(_, _, val)
+        local enabledChk = AceGUI:Create("CheckBox")
+        enabledChk:SetLabel("")
+        enabledChk:SetWidth(30)
+        enabledChk:SetValue(qdb[q].enabled)
+        enabledChk:SetCallback("OnValueChanged", function(_, _, val)
             qdb[q].enabled = val
         end)
-        row:AddChild(rowChk)
+        row:AddChild(enabledChk)
+
+        local qualLbl = AceGUI:Create("Label")
+        qualLbl:SetText(info.color .. L[info.name] .. "|r")
+        qualLbl:SetWidth(165)
+        row:AddChild(qualLbl)
 
         local ilvlBox = AceGUI:Create("EditBox")
-        ilvlBox:SetLabel("ilvl >=")
+        ilvlBox:SetLabel("")
         ilvlBox:SetText(tostring(qdb[q].ilvl))
-        ilvlBox:SetWidth(80)
+        ilvlBox:SetWidth(90)
         ilvlBox:SetCallback("OnEnterPressed", function(_, _, val)
             qdb[q].ilvl = tonumber(val) or 0
             ilvlBox:SetText(tostring(qdb[q].ilvl))
         end)
         row:AddChild(ilvlBox)
 
-        for _, bind in ipairs(BINDS) do
-            local bkey = bind.key
-            local bindChk = AceGUI:Create("CheckBox")
-            bindChk:SetLabel(L[bind.label])
-            bindChk:SetValue(qdb[q][bkey])
-            bindChk:SetWidth(80)
-            bindChk:SetCallback("OnValueChanged", function(_, _, val)
-                qdb[q][bkey] = val
-            end)
-            row:AddChild(bindChk)
-        end
+        local boeChk = AceGUI:Create("CheckBox")
+        boeChk:SetLabel("")
+        boeChk:SetWidth(75)
+        boeChk:SetValue(qdb[q].boe)
+        boeChk:SetCallback("OnValueChanged", function(_, _, val)
+            qdb[q].boe = val
+        end)
+        row:AddChild(boeChk)
+
+        local bopChk = AceGUI:Create("CheckBox")
+        bopChk:SetLabel("")
+        bopChk:SetWidth(75)
+        bopChk:SetValue(qdb[q].bop)
+        bopChk:SetCallback("OnValueChanged", function(_, _, val)
+            qdb[q].bop = val
+        end)
+        row:AddChild(bopChk)
     end
 end

@@ -17,12 +17,12 @@ local defaults = {
             artifact = true,
         },
         quality = {
-            [0] = { enabled = false, nob = true, boe = true, bop = true, ilvl = 0 },
-            [1] = { enabled = false, nob = true, boe = true, bop = true, ilvl = 0 },
-            [2] = { enabled = false, nob = true, boe = true, bop = true, ilvl = 0 },
-            [3] = { enabled = false, nob = true, boe = true, bop = true, ilvl = 0 },
-            [4] = { enabled = false, nob = true, boe = true, bop = true, ilvl = 0 },
-            [5] = { enabled = false, nob = true, boe = true, bop = true, ilvl = 0 },
+            [0] = { enabled = false, boe = true, bop = true, ilvl = 0 },
+            [1] = { enabled = false, boe = true, bop = true, ilvl = 0 },
+            [2] = { enabled = false, boe = true, bop = true, ilvl = 0 },
+            [3] = { enabled = false, boe = true, bop = true, ilvl = 0 },
+            [4] = { enabled = false, boe = true, bop = true, ilvl = 0 },
+            [5] = { enabled = false, boe = true, bop = true, ilvl = 0 },
         },
     },
 }
