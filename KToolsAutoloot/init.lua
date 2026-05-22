@@ -29,7 +29,8 @@ local defaults = {
 
 function AutoLoot:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("KToolsAutolootDB", defaults, true)
-    KTools:RegisterModule(ADDON, self, { minWidth = 900, minHeight = 600 })
+    local label = GetAddOnMetadata(ADDON, "X-ModuleName") or ADDON
+    KTools:RegisterModule(ADDON, self, { minWidth = 750, minHeight = 500, label = label })
 end
 
 function AutoLoot:OnEnable()
@@ -37,7 +38,7 @@ function AutoLoot:OnEnable()
 end
 
 function AutoLoot:ShowModule()
-    KTools:ShowMainFrame()
+    KTools:ShowMainFrameWithModule(ADDON)
 end
 
 function AutoLoot:Draw(container)

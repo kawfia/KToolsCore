@@ -18,7 +18,7 @@ tinsert(UISpecialFrames, ESC_NAME)
 function KTools:RegisterModule(name, module, opts)
     local entry = {
         name      = name,
-        label     = L[name] or name,
+        label     = (opts and opts.label) or L[name] or name,
         module    = module,
         minWidth  = opts and opts.minWidth  or MIN_W,
         minHeight = opts and opts.minHeight or MIN_H,

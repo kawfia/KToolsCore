@@ -1,7 +1,7 @@
+[2026-05-22] KToolsAutoLoot v0.1.4: X-ModuleName=AutoLoot в .toc, label читается через GetAddOnMetadata и передаётся в RegisterModule(opts.label). ShowModule→ShowMainFrameWithModule. minWidth=750, minHeight=500.
+[2026-05-22] KToolsAutoLoot ui/main.lua: Export+Import перемещены в начало bottomRow (убран spacer), switchBtn=SetWidth(120) — фиксированная ширина.
+[2026-05-22] KTools/core/ui.lua v0.2.0: RegisterModule поддерживает opts.label как приоритет над L[name].
 [2026-05-22] core/ui.lua: MIN_W/MIN_H=700/500, RefreshTree без авто-выбора, новые методы GetModules()+ShowMainFrameWithModule(). OnGroupSelected динамически SetMinResize по модулю.
 [2026-05-22] core/minimap.lua: ПКМ → EasyMenu со списком модулей (menuFrame на уровне модуля), ЛКМ → ToggleMainFrame без выбора вкладки.
 [2026-05-22] KToolsAutoLoot UI пересмотрен v0.1.3: шапка — 2 ряда (enable+switchBtn / profile+create+delete|import+export); категории — два SimpleGroup по 0.5 шириной (CATEGORIES_LEFT/RIGHT, 4+4); фильтр по качеству — заголовочный ряд (Label x4) + строки без подписей (checkbox+Label+EditBox+checkbox+checkbox); ключ nob удалён из БД, boe покрывает NoB+BoE. Новые locale-ключи: QF_HDR_ENABLED/ILVL/BOE/BOP.
 [2026-05-22] Reference HTML обновлён: autoloot_filter.html — 2-рядная шапка, 2-колоночные категории, таблица качества с заголовком (BoE/BoP без NoB). autoloot_customlist.html — 2-рядная шапка, панель фильтра, заголовки колонок (Сбор|ID|Предмет|ilvl>=|Удалить), ромб-иконка качества, убрана колонка Тип. ТЗ KToolsAutoLoot.md обновлено по кастом-списку.
-[2026-05-21] core/minimap.lua реализован: LDB:NewDataObject + LibDBIcon:Register, db=profile.minimap, OnClick→ToggleMainFrame. Версия → 0.1.4.
-[2026-05-21] core/ui.lua реализован: ADDON=..., RegisterModule, SafeCall, ShowMainFrame/Hide/Toggle, LibWindow-1.1 для позиции, AceGUI Frame+TabGroup.
-[2026-05-21] init.lua реализован: AceAddon:NewAddon, AceDB:New("KToolsDB"), slash /ktools /ktl → ToggleMainFrame.

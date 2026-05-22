@@ -3,7 +3,8 @@
 ## Notes: Auto-loot with configurable rules
 ## Notes-ruRU: Авто-лут по настраиваемым правилам
 ## Author: kawfia
-## Version: 0.1.3
+## Version: 0.1.4
+## X-ModuleName: AutoLoot
 ## Dependencies: KTools
 ## SavedVariables: KToolsAutolootDB
 
