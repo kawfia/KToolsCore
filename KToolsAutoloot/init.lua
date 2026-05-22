@@ -29,7 +29,7 @@ local defaults = {
 
 function AutoLoot:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("KToolsAutolootDB", defaults, true)
-    KTools:RegisterModule(ADDON, self)
+    KTools:RegisterModule(ADDON, self, { minWidth = 900, minHeight = 600 })
 end
 
 function AutoLoot:OnEnable()
