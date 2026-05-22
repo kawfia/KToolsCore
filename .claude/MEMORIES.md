@@ -1,7 +1,5 @@
-[2026-05-22] KToolsAutoLoot engine.lua v0.2.3: fix гонки UnregisterEvent/CloseLoot. UnregisterEvent("LOOT_OPENED") перенесён первой строкой OnLootOpened, до CloseLoot(). Убран явный CloseLoot() после лут-цикла — WoW закрывает окно сам.
-[2026-05-22] common-mistakes.md: добавлена запись — CloseLoot() внутри LOOT_OPENED вызывает LOOT_CLOSED синхронно, уничтожает RegisterEvent следующего контейнера.
-[2026-05-22] KToolsAutoLoot engine.lua v0.2.1: авто-открытие контейнеров — опция autoOpen, LOOT_CLOSED→ScanAndOpenContainer (lootable=6й, UseContainerItem, InCombatLockdown). Флаг lootingContainer → лут всего без ShouldLoot.
-[2026-05-22] KToolsAutoLoot ui/custom.lua: имена предметов окрашены в цвет редкости, неизвестные серым.
-[2026-05-22] KToolsAutoLoot core/engine.lua v0.1.9: полный движок лута, LOOT_READY→LOOT_OPENED, ShouldLoot OR-логика, tooltip-scan Artifact Power, skinning, BoP.
-[2026-05-22] KToolsAutoLoot core/options.lua: четыре toggle-опции (bop, skinning, emptyLoot, autoOpen), AceConfig под KTools.
-[2026-05-22] KTools/core/ui.lua v0.2.0: RegisterModule поддерживает opts.label.
+[2026-05-22] KToolsAutoLoot profiles.lua v0.2.5: переделан под ElvUI-паттерн. OpenExportDialog — flow 800px, пустой box, кнопка "Экспортировать" заполняет + HookScript OnChar защита. OpenImportDialog — flow 800px, кнопки "Импортировать" + "Декодировать" (валидация без применения). ValidateImportString — отдельный метод.
+[2026-05-22] KToolsAutoLoot ui/main.lua v0.2.5: header row2 переделан — EditBox "Новый" с placeholder + HookScript focus, Dropdown "Активный", Dropdown "Удалить" + StaticPopup подтверждения, кнопки Import/Export выровнены.
+[2026-05-22] KToolsAutoLoot profiles.lua v0.2.4: новый файл core/profiles.lua. ExportProfile/ImportProfile через AceSerializer-3.0+LibDeflate. RefreshModuleUI→KTools:ShowMainFrameWithModule.
+[2026-05-22] KTools lib/load.xml v0.2.1: добавлены AceSerializer-3.0 и LibDeflate. Библиотеки копировать вручную из .claude/reference/lib/.
+[2026-05-22] KToolsAutoLoot engine.lua v0.2.3: fix гонки UnregisterEvent/CloseLoot. UnregisterEvent("LOOT_OPENED") перенесён первой строкой OnLootOpened, до CloseLoot(). Убран явный CloseLoot() после лут-цикла.

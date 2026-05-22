@@ -37,7 +37,7 @@ function AutoLoot:Draw(container)
     content:SetFullWidth(true)
     container:AddChild(content)
 
-    -- Row 1: enabled checkbox + view switch
+    -- Row 1: enabled + view switch
     local topRow = AceGUI:Create("SimpleGroup")
     topRow:SetLayout("Flow")
     topRow:SetFullWidth(true)
@@ -74,81 +74,116 @@ function AutoLoot:Draw(container)
     end)
     topRow:AddChild(switchBtn)
 
-    -- Row 2: profiles | import/export
-    local bottomRow = AceGUI:Create("SimpleGroup")
-    bottomRow:SetLayout("Flow")
-    bottomRow:SetFullWidth(true)
-    header:AddChild(bottomRow)
+    -- Row 2: [Новый EditBox] [Активный Dropdown] [Удалить Dropdown] [spacer] [Импорт] [Экспорт]
+    local profileRow = AceGUI:Create("SimpleGroup")
+    profileRow:SetLayout("Flow")
+    profileRow:SetFullWidth(true)
+    header:AddChild(profileRow)
 
-    local profileGroup = AceGUI:Create("SimpleGroup")
-    profileGroup:SetLayout("Flow")
-    profileGroup:SetRelativeWidth(0.65)
-    bottomRow:AddChild(profileGroup)
+    -- Новый: EditBox с placeholder
+    local newBox = AceGUI:Create("EditBox")
+    newBox:SetLabel(L["PROFILE_NEW"])
+    newBox:SetWidth(160)
+    newBox:SetText(L["PROFILE_NEW_PLACEHOLDER"])
+    newBox.editBox:SetTextColor(0.5, 0.5, 0.5)
 
-    local profileDrop = AceGUI:Create("Dropdown")
-    profileDrop:SetLabel(L["PROFILE"])
-    profileDrop:SetWidth(140)
-    profileDrop:SetList(buildProfileMap(AutoLoot.db))
-    profileDrop:SetValue(AutoLoot.db:GetCurrentProfile())
-    profileDrop:SetCallback("OnValueChanged", function(_, _, name)
+    local isPlaceholder = true
+    newBox.editBox:HookScript("OnEditFocusGained", function(self)
+        if isPlaceholder then
+            self:SetText("")
+            self:SetTextColor(1, 1, 1)
+            isPlaceholder = false
+        end
+    end)
+    newBox.editBox:HookScript("OnEditFocusLost", function(self)
+        if self:GetText() == "" then
+            self:SetText(L["PROFILE_NEW_PLACEHOLDER"])
+            self:SetTextColor(0.5, 0.5, 0.5)
+            isPlaceholder = true
+        end
+    end)
+    newBox:SetCallback("OnEnterPressed", function(_, _, text)
+        if not isPlaceholder and text ~= "" then
+            AutoLoot.db:SetProfile(text)
+            AutoLoot:RefreshModuleUI()
+        end
+        newBox:ClearFocus()
+    end)
+    profileRow:AddChild(newBox)
+
+    -- Активный: Dropdown переключения профиля
+    local activeDrop = AceGUI:Create("Dropdown")
+    activeDrop:SetLabel(L["PROFILE_ACTIVE"])
+    activeDrop:SetWidth(140)
+    activeDrop:SetList(buildProfileMap(AutoLoot.db))
+    activeDrop:SetValue(AutoLoot.db:GetCurrentProfile())
+    activeDrop:SetCallback("OnValueChanged", function(_, _, name)
         AutoLoot.db:SetProfile(name)
         AutoLoot:RefreshModuleUI()
     end)
-    profileGroup:AddChild(profileDrop)
+    profileRow:AddChild(activeDrop)
 
-    local createBtn = AceGUI:Create("Button")
-    createBtn:SetText(L["PROFILE_CREATE"])
-    createBtn:SetWidth(80)
-    createBtn:SetCallback("OnClick", function()
-        StaticPopupDialogs["KTOOLSAUTOLOOT_CREATE_PROFILE"] = {
-            text        = L["PROFILE_CREATE_PROMPT"],
-            button1     = ACCEPT,
-            button2     = CANCEL,
-            hasEditBox  = 1,
-            maxLetters  = 50,
-            OnAccept    = function(dialog)
-                local name = dialog.editBox:GetText()
-                if name and name ~= "" then
-                    AutoLoot.db:SetProfile(name)
-                    AutoLoot:RefreshModuleUI()
-                end
-            end,
-            timeout = 0, whileDead = 1, hideOnEscape = 1,
-        }
-        StaticPopup_Show("KTOOLSAUTOLOOT_CREATE_PROFILE")
-    end)
-    profileGroup:AddChild(createBtn)
-
+    -- Удалить: Dropdown с подтверждением
     local deleteDrop = AceGUI:Create("Dropdown")
     deleteDrop:SetLabel(L["PROFILE_DELETE"])
     deleteDrop:SetWidth(140)
     deleteDrop:SetList(buildDeleteMap(AutoLoot.db))
     deleteDrop:SetCallback("OnValueChanged", function(_, _, name)
-        AutoLoot.db:DeleteProfile(name)
-        AutoLoot:RefreshModuleUI()
+        StaticPopupDialogs["KTOOLSAUTOLOOT_DELETE_PROFILE"] = {
+            text    = string.format(L["PROFILE_DELETE_CONFIRM"], name),
+            button1 = ACCEPT,
+            button2 = CANCEL,
+            OnAccept = function()
+                AutoLoot.db:DeleteProfile(name)
+                AutoLoot:RefreshModuleUI()
+            end,
+            timeout = 0, whileDead = 1, hideOnEscape = 1,
+        }
+        StaticPopup_Show("KTOOLSAUTOLOOT_DELETE_PROFILE")
     end)
-    profileGroup:AddChild(deleteDrop)
+    profileRow:AddChild(deleteDrop)
 
-    local actionGroup = AceGUI:Create("SimpleGroup")
-    actionGroup:SetLayout("Flow")
-    actionGroup:SetRelativeWidth(0.35)
-    bottomRow:AddChild(actionGroup)
+    local rowSpacer = AceGUI:Create("Label")
+    rowSpacer:SetText("")
+    rowSpacer:SetRelativeWidth(0.05)
+    profileRow:AddChild(rowSpacer)
+
+    -- Кнопки импорт/экспорт без метки — выровнены по высоте с дропдаунами через Label-заглушку
+    local importGroup = AceGUI:Create("SimpleGroup")
+    importGroup:SetLayout("List")
+    importGroup:SetWidth(90)
+    profileRow:AddChild(importGroup)
+
+    local importLbl = AceGUI:Create("Label")
+    importLbl:SetText(" ")
+    importLbl:SetFullWidth(true)
+    importGroup:AddChild(importLbl)
 
     local importBtn = AceGUI:Create("Button")
     importBtn:SetText(L["IMPORT"])
-    importBtn:SetWidth(90)
+    importBtn:SetFullWidth(true)
     importBtn:SetCallback("OnClick", function()
         AutoLoot:OpenImportDialog()
     end)
-    actionGroup:AddChild(importBtn)
+    importGroup:AddChild(importBtn)
+
+    local exportGroup = AceGUI:Create("SimpleGroup")
+    exportGroup:SetLayout("List")
+    exportGroup:SetWidth(90)
+    profileRow:AddChild(exportGroup)
+
+    local exportLbl = AceGUI:Create("Label")
+    exportLbl:SetText(" ")
+    exportLbl:SetFullWidth(true)
+    exportGroup:AddChild(exportLbl)
 
     local exportBtn = AceGUI:Create("Button")
     exportBtn:SetText(L["EXPORT"])
-    exportBtn:SetWidth(90)
+    exportBtn:SetFullWidth(true)
     exportBtn:SetCallback("OnClick", function()
         AutoLoot:OpenExportDialog()
     end)
-    actionGroup:AddChild(exportBtn)
+    exportGroup:AddChild(exportBtn)
 
     AutoLoot:DrawQuickSettings(content)
 end
