@@ -5,6 +5,8 @@ local L = LibStub("AceLocale-3.0"):GetLocale(ADDON)
 local AceGUI = LibStub("AceGUI-3.0")
 local LibWindow = LibStub("LibWindow-1.1")
 
+local MIN_W, MIN_H = 700, 500
+
 local modules = {}
 local modulesByName = {}
 local mainFrame
@@ -18,8 +20,8 @@ function KTools:RegisterModule(name, module, opts)
         name      = name,
         label     = L[name] or name,
         module    = module,
-        minWidth  = opts and opts.minWidth  or 800,
-        minHeight = opts and opts.minHeight or 600,
+        minWidth  = opts and opts.minWidth  or MIN_W,
+        minHeight = opts and opts.minHeight or MIN_H,
     }
     tinsert(modules, entry)
     modulesByName[name] = entry
@@ -35,6 +37,10 @@ function KTools:SafeCall(module, method, ...)
             geterrorhandler()(err)
         end
     end
+end
+
+function KTools:GetModules()
+    return modules
 end
 
 local function OnGroupSelected(widget, _, group)
@@ -61,9 +67,6 @@ function KTools:RefreshTree()
         tinsert(tree, { value = entry.name, text = entry.label })
     end
     treeGroup:SetTree(tree)
-    if #tree > 0 then
-        treeGroup:SelectByValue(modules[1].name)
-    end
 end
 
 function KTools:ShowMainFrame()
@@ -73,8 +76,8 @@ function KTools:ShowMainFrame()
     end
 
     local win = self.db.profile.window
-    win.width  = math.max(win.width  or 800, 800)
-    win.height = math.max(win.height or 600, 600)
+    win.width  = math.max(win.width  or MIN_W, MIN_W)
+    win.height = math.max(win.height or MIN_H, MIN_H)
 
     local version = GetAddOnMetadata(ADDON, "Version") or "?"
     local author  = GetAddOnMetadata(ADDON, "Author")  or "?"
@@ -85,7 +88,7 @@ function KTools:ShowMainFrame()
     mainFrame:SetStatusText("v " .. version .. " | by " .. author)
     mainFrame:SetWidth(win.width)
     mainFrame:SetHeight(win.height)
-    mainFrame.frame:SetMinResize(800, 600)
+    mainFrame.frame:SetMinResize(MIN_W, MIN_H)
 
     mainFrame:SetCallback("OnClose", function(widget)
         win.width  = widget.frame:GetWidth()
@@ -107,6 +110,13 @@ function KTools:ShowMainFrame()
     mainFrame:AddChild(treeGroup)
 
     self:RefreshTree()
+end
+
+function KTools:ShowMainFrameWithModule(name)
+    self:ShowMainFrame()
+    if treeGroup and modulesByName[name] then
+        treeGroup:SelectByValue(name)
+    end
 end
 
 function KTools:HideMainFrame()

@@ -5,12 +5,29 @@ local L = LibStub("AceLocale-3.0"):GetLocale(ADDON)
 local LDB = LibStub("LibDataBroker-1.1")
 local LibDBIcon = LibStub("LibDBIcon-1.0")
 
+local menuFrame = CreateFrame("Frame", ADDON .. "MinimapMenu", UIParent, "UIDropDownMenuTemplate")
+
 local ldbObject = LDB:NewDataObject(ADDON, {
     type = "launcher",
     icon = "Interface\\AddOns\\" .. ADDON .. "\\media\\minimapButton_dx5",
     OnClick = function(self, button)
         if button == "LeftButton" then
             KTools:ToggleMainFrame()
+        elseif button == "RightButton" then
+            local mods = KTools:GetModules()
+            local menuList = {}
+            for _, entry in ipairs(mods) do
+                local name = entry.name
+                local label = entry.label
+                tinsert(menuList, {
+                    text        = label,
+                    func        = function()
+                        KTools:ShowMainFrameWithModule(name)
+                    end,
+                    notCheckable = true,
+                })
+            end
+            EasyMenu(menuList, menuFrame, "cursor", 0, 0, "MENU")
         end
     end,
     OnTooltipShow = function(tooltip)
