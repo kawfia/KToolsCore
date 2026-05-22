@@ -14,6 +14,7 @@ local QUALITY_COLORS = {
 }
 
 local filterByEnabled = false
+local activeScrollFrame = nil
 
 local function extractId(text)
     return tonumber(text) or tonumber(string.match(text or "", "item:(%d+)"))
@@ -29,7 +30,7 @@ local function redrawList(scrollFrame)
     scrollFrame:AddChild(hdr)
 
     local hCollect = AceGUI:Create("Label")
-    hCollect:SetText(L["CL_HDR_COLLECT"])
+    hCollect:SetText("")
     hCollect:SetWidth(35)
     hdr:AddChild(hCollect)
 
@@ -65,7 +66,7 @@ local function redrawList(scrollFrame)
     for _, id in ipairs(ids) do
         local entry = cl[id]
         if not filterByEnabled or entry.enabled then
-            local name, _, quality = GetItemInfo(id)
+            local name, itemLink, quality, _, _, _, _, _, _, icon = GetItemInfo(id)
             name = name or ("id:" .. id)
             local color = QUALITY_COLORS[quality] or "|cff888888"
 
@@ -83,9 +84,30 @@ local function redrawList(scrollFrame)
             end)
             row:AddChild(chk)
 
-            local dia = AceGUI:Create("Label")
-            dia:SetText(color .. L["CL_ICON_QUALITY"] .. "|r")
+            local dia = AceGUI:Create("InteractiveLabel")
+            if icon then
+                dia:SetImage(icon)
+                dia:SetImageSize(16, 16)
+                dia:SetText("")
+            else
+                dia:SetText(color .. "?" .. "|r")
+            end
             dia:SetWidth(22)
+            dia:SetCallback("OnEnter", function(widget)
+                if itemLink then
+                    GameTooltip:SetOwner(widget.frame, "ANCHOR_CURSOR")
+                    GameTooltip:SetHyperlink(itemLink)
+                    GameTooltip:Show()
+                end
+            end)
+            dia:SetCallback("OnLeave", function()
+                GameTooltip:Hide()
+            end)
+            dia:SetCallback("OnClick", function()
+                if itemLink and IsShiftKeyDown() then
+                    ChatEdit_InsertLink(itemLink)
+                end
+            end)
             row:AddChild(dia)
 
             local idLbl = AceGUI:Create("Label")
@@ -121,13 +143,18 @@ local function redrawList(scrollFrame)
     end
 end
 
+local function onItemInfoReceived()
+    if activeScrollFrame then
+        redrawList(activeScrollFrame)
+    end
+end
+
 function AutoLoot:DrawCustomList(container)
     container:SetLayout("List")
     filterByEnabled = false
 
     local cl = AutoLoot.db.profile.customList
 
-    -- Секция добавления (InlineGroup — паттерн как в quick.lua)
     local addGroup = AceGUI:Create("InlineGroup")
     addGroup:SetTitle(L["CL_ADD_TITLE"])
     addGroup:SetLayout("List")
@@ -265,6 +292,15 @@ function AutoLoot:DrawCustomList(container)
     end)
 
     addBtn:SetCallback("OnClick", doAdd)
+
+    activeScrollFrame = scrollFrame
+    AutoLoot:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
+    AutoLoot:RegisterEvent("GET_ITEM_INFO_RECEIVED", onItemInfoReceived)
+
+    scrollFrame:SetCallback("OnRelease", function()
+        activeScrollFrame = nil
+        AutoLoot:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
+    end)
 
     redrawList(scrollFrame)
 end
