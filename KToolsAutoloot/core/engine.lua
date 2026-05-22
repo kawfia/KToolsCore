@@ -124,6 +124,8 @@ end
 
 function AutoLoot:OnLootOpened()
     lootOpen = true
+    self:UnregisterEvent("LOOT_OPENED")
+
     local db = self.db.profile
     local n  = GetNumLootItems()
 
@@ -131,7 +133,6 @@ function AutoLoot:OnLootOpened()
         if db.options.emptyLoot or lootingContainer then
             CloseLoot()
         end
-        self:UnregisterEvent("LOOT_OPENED")
         return
     end
 
@@ -140,12 +141,6 @@ function AutoLoot:OnLootOpened()
             LootSlot(i)
         end
     end
-
-    if lootingContainer then
-        CloseLoot()
-    end
-
-    self:UnregisterEvent("LOOT_OPENED")
 end
 
 function AutoLoot:OnLootClosed()
