@@ -6,6 +6,23 @@ local L = LibStub("AceLocale-3.0"):GetLocale(ADDON)
 
 local currentView = "quick"
 
+local function buildProfileMap(db)
+    local t, list = {}, {}
+    db:GetProfiles(list)
+    for _, name in ipairs(list) do t[name] = name end
+    return t
+end
+
+local function buildDeleteMap(db)
+    local t, list = {}, {}
+    db:GetProfiles(list)
+    local current = db:GetCurrentProfile()
+    for _, name in ipairs(list) do
+        if name ~= current then t[name] = name end
+    end
+    return t
+end
+
 function AutoLoot:Draw(container)
     container:SetLayout("List")
     currentView = "quick"
@@ -20,7 +37,7 @@ function AutoLoot:Draw(container)
     content:SetFullWidth(true)
     container:AddChild(content)
 
-    -- Ряд 1: чекбокс включения (слева, 160px) + кнопка переключения (справа, 215px)
+    -- Row 1: enabled checkbox + view switch
     local topRow = AceGUI:Create("SimpleGroup")
     topRow:SetLayout("Flow")
     topRow:SetFullWidth(true)
@@ -57,7 +74,7 @@ function AutoLoot:Draw(container)
     end)
     topRow:AddChild(switchBtn)
 
-    -- Ряд 2: профили (левая группа, 65%) | импорт/экспорт (правая группа, 35%)
+    -- Row 2: profiles | import/export
     local bottomRow = AceGUI:Create("SimpleGroup")
     bottomRow:SetLayout("Flow")
     bottomRow:SetFullWidth(true)
@@ -70,19 +87,46 @@ function AutoLoot:Draw(container)
 
     local profileDrop = AceGUI:Create("Dropdown")
     profileDrop:SetLabel(L["PROFILE"])
-    profileDrop:SetWidth(120)
-    profileDrop:SetList({})
+    profileDrop:SetWidth(140)
+    profileDrop:SetList(buildProfileMap(AutoLoot.db))
+    profileDrop:SetValue(AutoLoot.db:GetCurrentProfile())
+    profileDrop:SetCallback("OnValueChanged", function(_, _, name)
+        AutoLoot.db:SetProfile(name)
+        AutoLoot:RefreshModuleUI()
+    end)
     profileGroup:AddChild(profileDrop)
 
     local createBtn = AceGUI:Create("Button")
     createBtn:SetText(L["PROFILE_CREATE"])
     createBtn:SetWidth(80)
+    createBtn:SetCallback("OnClick", function()
+        StaticPopupDialogs["KTOOLSAUTOLOOT_CREATE_PROFILE"] = {
+            text        = L["PROFILE_CREATE_PROMPT"],
+            button1     = ACCEPT,
+            button2     = CANCEL,
+            hasEditBox  = 1,
+            maxLetters  = 50,
+            OnAccept    = function(dialog)
+                local name = dialog.editBox:GetText()
+                if name and name ~= "" then
+                    AutoLoot.db:SetProfile(name)
+                    AutoLoot:RefreshModuleUI()
+                end
+            end,
+            timeout = 0, whileDead = 1, hideOnEscape = 1,
+        }
+        StaticPopup_Show("KTOOLSAUTOLOOT_CREATE_PROFILE")
+    end)
     profileGroup:AddChild(createBtn)
 
     local deleteDrop = AceGUI:Create("Dropdown")
     deleteDrop:SetLabel(L["PROFILE_DELETE"])
-    deleteDrop:SetWidth(120)
-    deleteDrop:SetList({})
+    deleteDrop:SetWidth(140)
+    deleteDrop:SetList(buildDeleteMap(AutoLoot.db))
+    deleteDrop:SetCallback("OnValueChanged", function(_, _, name)
+        AutoLoot.db:DeleteProfile(name)
+        AutoLoot:RefreshModuleUI()
+    end)
     profileGroup:AddChild(deleteDrop)
 
     local actionGroup = AceGUI:Create("SimpleGroup")
@@ -93,11 +137,17 @@ function AutoLoot:Draw(container)
     local importBtn = AceGUI:Create("Button")
     importBtn:SetText(L["IMPORT"])
     importBtn:SetWidth(90)
+    importBtn:SetCallback("OnClick", function()
+        AutoLoot:OpenImportDialog()
+    end)
     actionGroup:AddChild(importBtn)
 
     local exportBtn = AceGUI:Create("Button")
     exportBtn:SetText(L["EXPORT"])
     exportBtn:SetWidth(90)
+    exportBtn:SetCallback("OnClick", function()
+        AutoLoot:OpenExportDialog()
+    end)
     actionGroup:AddChild(exportBtn)
 
     AutoLoot:DrawQuickSettings(content)
