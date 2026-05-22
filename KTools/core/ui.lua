@@ -47,6 +47,7 @@ local function OnGroupSelected(widget, _, group)
     widget:ReleaseChildren()
     local entry = modulesByName[group]
     if entry and mainFrame then
+        KTools.db.profile.lastModule = group
         local minW = entry.minWidth
         local minH = entry.minHeight
         mainFrame.frame:SetMinResize(minW, minH)
@@ -69,7 +70,7 @@ function KTools:RefreshTree()
     treeGroup:SetTree(tree)
 end
 
-function KTools:ShowMainFrame()
+function KTools:ShowMainFrame(skipRestore)
     if mainFrame then
         mainFrame.frame:Show()
         return
@@ -110,10 +111,17 @@ function KTools:ShowMainFrame()
     mainFrame:AddChild(treeGroup)
 
     self:RefreshTree()
+
+    if not skipRestore then
+        local last = self.db.profile.lastModule
+        if last and last ~= "" and modulesByName[last] then
+            treeGroup:SelectByValue(last)
+        end
+    end
 end
 
 function KTools:ShowMainFrameWithModule(name)
-    self:ShowMainFrame()
+    self:ShowMainFrame(true)
     if treeGroup and modulesByName[name] then
         treeGroup:SelectByValue(name)
     end

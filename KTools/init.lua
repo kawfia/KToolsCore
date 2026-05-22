@@ -16,6 +16,7 @@ local defaults = {
         minimap = {
             hide = false,
         },
+        lastModule = "",
     },
 }
 
