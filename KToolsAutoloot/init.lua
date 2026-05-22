@@ -25,6 +25,11 @@ local defaults = {
             [5] = { enabled = false, boe = true, bop = true, ilvl = 0 },
         },
         customList = {},
+        options = {
+            bop       = false,
+            skinning  = false,
+            emptyLoot = false,
+        },
     },
 }
 

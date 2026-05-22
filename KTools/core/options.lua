@@ -24,3 +24,8 @@ local options = {
 
 LibStub("AceConfig-3.0"):RegisterOptionsTable(ADDON, options)
 LibStub("AceConfigDialog-3.0"):AddToBlizOptions(ADDON)
+
+
+function KTools:GetOptionsName()
+    return ADDON
+end
