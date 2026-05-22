@@ -10,4 +10,5 @@ end
 function KTools:OnEnable()
     self:RegisterChatCommand("ktools", "ToggleMainFrame")
     self:RegisterChatCommand("ktl", "ToggleMainFrame")
+    self:SetupMinimap()
 end
