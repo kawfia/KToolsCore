@@ -18,8 +18,9 @@
 | Мгновенное закрытие пустого лута | Закрыть окно лута сразу если оно пустое |
 
 ## Интерфейс
-Главное окно с двумя вкладками: «Быстрые настройки» и «Пользовательский список».
-Диаграмма: `.claude/reference/autoloot_filter.html`, `.claude/reference/autoloot_customlist.html`
+Модуль рендерит UI внутри фрейма-контейнера KTools (передаётся через `KTools:RegisterModule`). Собственного окна нет.
+Две вкладки: «Быстрые настройки» и «Пользовательский список».
+Диаграммы: `.claude/reference/autoloot_filter.html`, `.claude/reference/autoloot_customlist.html`
 
 ## Описание кнопок интерфейса
 
@@ -38,16 +39,16 @@
 ### Вкладка: Быстрые настройки
 
 #### Быстрые категории
-| Кнопка | Описание | Статус |
-|---|---|---|
-| Золото | Монеты с лута | + |
-| Реагенты | TradeGoods + Reagent | + |
-| Рецепты | Все рецепты | + |
-| Маунты | Предметы-маунты | + |
-| Питомцы | Боевые питомцы | - |
-| Квестовые предметы | Тип Quest | - |
-| Валюта | Жетоны и валюты | + |
-| Сила артефакта | Предметы силы артефакта (tooltip-scan) | + |
+| Кнопка | Описание |
+|---|---|
+| Золото | Монеты с лута |
+| Реагенты | TradeGoods + Reagent |
+| Рецепты | Все рецепты |
+| Маунты | Предметы-маунты |
+| Питомцы | Боевые питомцы |
+| Квестовые предметы | Тип Quest и квестовый bindType |
+| Валюта | Жетоны и валюты |
+| Сила артефакта | Предметы силы артефакта (tooltip-scan) |
 
 #### Фильтр по качеству и ilvl
 | Качество | NoB | BoE | BoP | ilvl >= |
@@ -60,7 +61,8 @@
 | Legendary | + | + | + | поле |
 
 Каждая строка: три чекбокса + одно поле `ilvl >=` на всю строку.
-NoB — не привязан, BoE — при экипировке, BoP — при подборе.
+NoB — не привязан (bindType=0), BoE — при экипировке (bindType=2), BoP — при подборе (bindType=1).
+> Значения bindType: `.claude/reference/core.h` → `enum ItemBondingType`
 
 ### Вкладка: Пользовательский список
 | Колонка | Тип | Описание |
@@ -108,7 +110,7 @@ KToolsAutoloot/
 
 Импорт/Экспорт профиля — паттерн ElvUI:
 `AceSerializer:Serialize` → `LibDeflate:CompressDeflate` → base64-строка.
-Reference: `.claude/reference/addons/ElvUI_Config/profiles.lua`
+> Reference: `.claude/reference/addons/ElvUI_Config/profiles.lua`
 
 ## WoW API (Legion 7.3.5)
 
@@ -130,23 +132,16 @@ Reference: `.claude/reference/addons/ElvUI_Config/profiles.lua`
 | `LootSlot(i)` | Подобрать предмет из слота |
 | `ConfirmLootSlot(i)` | Подтвердить BoP-подбор |
 | `CloseLoot()` | Закрыть окно лута |
-| `GetItemInfo(link)` | name, _, quality, ilvl, _, _, _, _, _, _, _, classID, subclassID |
+| `GetItemInfo(link)` | name, _, quality, ilvl, _, _, _, _, _, _, _, classID, subclassID, bindType |
 | `GetTime()` | Метка времени |
+
+> Числовые значения classID, subclassID, bindType: `.claude/reference/core.h` → `enum ItemClass`, `enum ItemBondingType`
 
 ### Типы слотов (объявлять локально в engine.lua)
 ```lua
 LOOT_SLOT_ITEM     = 1
 LOOT_SLOT_CURRENCY = 2
 LOOT_SLOT_MONEY    = 3
-```
-
-### Константы ItemClass (объявлять локально — в Legion 7.3.5 не глобальны)
-> Не использовать LE_ITEM_CLASS_* — Legion API их не поддерживает.
-```lua
-ITEM_CLASS_CONSUMABLE    = 0    ITEM_CLASS_TRADE_GOODS   = 7
-ITEM_CLASS_REAGENT       = 5    ITEM_CLASS_RECIPE        = 9
-ITEM_CLASS_QUEST         = 12   ITEM_CLASS_MISCELLANEOUS = 15
-ITEM_CLASS_BATTLE_PET    = 17
 ```
 
 ## Логика движка лута
@@ -160,18 +155,17 @@ LOOT_READY:
 LOOT_OPENED:
   n = GetNumLootItems()
   если n == 0 и опция emptyLoot включена: CloseLoot(); выйти
-  для i = n .. 1:
+  для i = n .. 1:        -- обратный порядок: LootSlot сдвигает индексы
     если ShouldLoot(i): LootSlot(i)
   отписаться от LOOT_OPENED
 ```
 
-> Проверка пустого лута перенесена в `LOOT_OPENED` — там список слотов гарантирован.
 > Reference паттерн: `.claude/reference/addons/ExRT/LootLink.lua`
 
 ### Фильтр ShouldLoot(i)
 Предмет подбирается если выполняется хотя бы одно из условий (OR-логика):
 1. **Быстрые категории** — тип предмета попадает под включённую категорию.
-2. **Фильтр качества** — quality + bonding попадают под включённую ячейку матрицы, AND ilvl >= порога.
+2. **Фильтр качества** — quality + bindType попадают под включённую ячейку матрицы, AND ilvl >= порога.
 3. **Пользовательский список** — itemID найден, запись включена, AND ilvl >= порога записи.
 
 Деньги (`LOOT_SLOT_MONEY`) — при включённой категории «Золото», вне матрицы качества.
@@ -189,6 +183,8 @@ LOOT_OPENED:
 > Проверить spellID при тестировании на Legion 7.3.5.
 
 ## Быстрые категории — соответствие ItemClass
+> Числовые значения классов: `.claude/reference/core.h` → `enum ItemClass`, `enum ItemSubclassMiscellaneous`
+
 | Категория | Условие |
 |---|---|
 | Золото | GetLootSlotType(i) == 3 |
@@ -196,7 +192,18 @@ LOOT_OPENED:
 | Рецепты | classID == 9 |
 | Маунты | classID == 15, subclassID == 5 |
 | Питомцы | classID == 17 ИЛИ (classID == 15, subclassID == 2) |
-| Квестовые | classID == 12 |
+| Квестовые | classID == 12 ИЛИ bindType == 4 |
 | Валюта | GetLootSlotType(i) == 2 |
 | Сила артефакта | tooltip-scan: string.find(line, ARTIFACT_POWER) |
-```
+
+## План разработки
+
+| Этап | Файлы | Версия |
+|---|---|---|
+| Скелет | toc, init.lua, locale/*, load.xml | 0.1.0 |
+| SavedVariables | core/settings.lua | 0.1.1 |
+| Движок лута | core/engine.lua | 0.1.2–0.1.6 |
+| UI | ui/main.lua, quick.lua, custom.lua | 0.1.7–0.1.9 |
+| Импорт/Экспорт | core/engine.lua (Serialize/Deserialize) | 0.2.0 |
+| Опции AceConfig | core/options.lua | 0.2.1 |
+| Локализация (финал) | locale/enUS.lua, ruRU.lua | 0.2.2 |
