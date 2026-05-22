@@ -24,13 +24,14 @@ local defaults = {
             [4] = { enabled = false, boe = true, bop = true, ilvl = 0 },
             [5] = { enabled = false, boe = true, bop = true, ilvl = 0 },
         },
+        customList = {},
     },
 }
 
 function AutoLoot:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("KToolsAutolootDB", defaults, true)
     local label = GetAddOnMetadata(ADDON, "X-ModuleName") or ADDON
-    KTools:RegisterModule(ADDON, self, { minWidth = 750, minHeight = 500, label = label })
+    KTools:RegisterModule(ADDON, self, { minWidth = 750, minHeight = 515, label = label })
 end
 
 function AutoLoot:OnEnable()
