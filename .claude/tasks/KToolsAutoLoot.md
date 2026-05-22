@@ -76,3 +76,8 @@ KToolsAutoloot/KToolsAutoLoot.toc   — точка входа
 
 ## SavedVariables
 > Уточнить после проверки репозитория
+
+---
+
+## План разработки
+
