@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>KToolsAutoLoot — Фильтр</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #1a1a2e; display: flex; justify-content: center; padding: 30px; font-family: monospace; font-size: 12px; color: #ccc; }
+
+  .window {
+    background: #1e1e1e;
+    border: 1px solid #555;
+    width: 680px;
+  }
+
+  /* Toolbar */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 8px;
+    background: #2a2a2a;
+    border-bottom: 1px solid #555;
+    flex-wrap: wrap;
+  }
+  .toolbar .check { width: 20px; height: 20px; border: 1px solid #777; background: #333; display: flex; align-items: center; justify-content: center; }
+  .toolbar .check::after { content: "✓"; color: #fff; font-size: 11px; }
+  .ctrl {
+    border: 1px solid #777;
+    background: #333;
+    color: #ccc;
+    padding: 3px 6px;
+    cursor: pointer;
+    font-size: 11px;
+    text-align: center;
+  }
+  .ctrl small { display: block; color: #888; font-size: 10px; }
+
+  hr.sep { border: none; border-top: 1px solid #444; margin: 0; }
+
+  /* Body */
+  .body { padding: 10px 12px; }
+
+  /* Categories grid */
+  .categories {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 40px;
+    padding: 10px 0;
+  }
+  .cat-item { display: flex; align-items: center; gap: 8px; }
+  .chk {
+    width: 18px; height: 18px;
+    border: 1px solid #777;
+    background: #333;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .chk.on::after { content: "✓"; color: #fff; font-size: 11px; }
+  .cat-label { color: #e8a23a; }
+  .cat-label.off { color: #888; }
+
+  /* Quality table */
+  .quality-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  .quality-table td { padding: 5px 4px; vertical-align: middle; white-space: nowrap; }
+  .ilvl-input {
+    width: 50px;
+    background: #111;
+    border: 1px solid #555;
+    color: #ccc;
+    padding: 2px 4px;
+    text-align: center;
+    font-size: 11px;
+  }
+  .bind-chk {
+    display: flex; align-items: center; gap: 4px; margin-right: 6px;
+  }
+  .bind-chk .chk { width: 16px; height: 16px; }
+  .bind-chks { display: flex; align-items: center; }
+
+  /* Footer */
+  .footer {
+    border-top: 1px solid #444;
+    padding: 4px 10px;
+    color: #666;
+    font-size: 10px;
+  }
+</style>
+</head>
+<body>
+<div class="window">
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="check"></div>
+    <div class="ctrl">Профиль<br><small>(dropdown)</small></div>
+    <div class="ctrl">Создать<br><small>(button)</small></div>
+    <div class="ctrl">Удалить<br><small>(dropdown)</small></div>
+    <div class="ctrl">Импорт<br><small>(button)</small></div>
+    <div class="ctrl">Экспорт<br><small>(button)</small></div>
+    <div class="ctrl" style="margin-left:auto;">Пользовательский список<br><small>(button)</small></div>
+  </div>
+
+  <hr class="sep">
+
+  <div class="body">
+
+    <!-- Categories -->
+    <div class="categories">
+      <div class="cat-item"><div class="chk on"></div><span class="cat-label">Реагенты</span></div>
+      <div class="cat-item"><div class="chk on"></div><span class="cat-label">Золото</span></div>
+
+      <div class="cat-item"><div class="chk on"></div><span class="cat-label">Рецепты</span></div>
+      <div class="cat-item"><div class="chk on"></div><span class="cat-label">Валюта</span></div>
+
+      <div class="cat-item"><div class="chk on"></div><span class="cat-label">Маунты</span></div>
+      <div class="cat-item"><div class="chk on"></div><span class="cat-label">Сила артефакта</span></div>
+
+      <div class="cat-item"><div class="chk"></div><span class="cat-label off">Питомцы</span></div>
+      <div class="cat-item"><div class="chk"></div><span class="cat-label off">Квестовые предметы</span></div>
+    </div>
+
+    <hr class="sep" style="margin:6px 0;">
+
+    <!-- Quality filters -->
+    <table class="quality-table">
+      <tr>
+        <td width="18"><div class="chk"></div></td>
+        <td width="80">Poor</td>
+        <td width="40" style="color:#888;">ilvl &gt;=</td>
+        <td><input class="ilvl-input" value="900"></td>
+        <td>
+          <div class="bind-chks">
+            <div class="bind-chk"><div class="chk on"></div> NoB</div>
+            <div class="bind-chk"><div class="chk on"></div> BoE</div>
+            <div class="bind-chk"><div class="chk on"></div> BoP</div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><div class="chk"></div></td>
+        <td>Common</td>
+        <td style="color:#888;">ilvl &gt;=</td>
+        <td><input class="ilvl-input" value="900"></td>
+        <td>
+          <div class="bind-chks">
+            <div class="bind-chk"><div class="chk on"></div> NoB</div>
+            <div class="bind-chk"><div class="chk on"></div> BoE</div>
+            <div class="bind-chk"><div class="chk on"></div> BoP</div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><div class="chk"></div></td>
+        <td style="color:#1eff00;">Uncommon</td>
+        <td style="color:#888;">ilvl &gt;=</td>
+        <td><input class="ilvl-input" value="900"></td>
+        <td>
+          <div class="bind-chks">
+            <div class="bind-chk"><div class="chk on"></div> NoB</div>
+            <div class="bind-chk"><div class="chk on"></div> BoE</div>
+            <div class="bind-chk"><div class="chk on"></div> BoP</div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><div class="chk"></div></td>
+        <td style="color:#0070dd;">Rare</td>
+        <td style="color:#888;">ilvl &gt;=</td>
+        <td><input class="ilvl-input" value="900"></td>
+        <td>
+          <div class="bind-chks">
+            <div class="bind-chk"><div class="chk on"></div> NoB</div>
+            <div class="bind-chk"><div class="chk on"></div> BoE</div>
+            <div class="bind-chk"><div class="chk on"></div> BoP</div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><div class="chk"></div></td>
+        <td style="color:#a335ee;">Epic</td>
+        <td style="color:#888;">ilvl &gt;=</td>
+        <td><input class="ilvl-input" value="900"></td>
+        <td>
+          <div class="bind-chks">
+            <div class="bind-chk"><div class="chk on"></div> NoB</div>
+            <div class="bind-chk"><div class="chk on"></div> BoE</div>
+            <div class="bind-chk"><div class="chk on"></div> BoP</div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><div class="chk"></div></td>
+        <td style="color:#ff8000;">Legendary</td>
+        <td style="color:#888;">ilvl &gt;=</td>
+        <td><input class="ilvl-input" value="900"></td>
+        <td>
+          <div class="bind-chks">
+            <div class="bind-chk"><div class="chk on"></div> NoB</div>
+            <div class="bind-chk"><div class="chk on"></div> BoE</div>
+            <div class="bind-chk"><div class="chk on"></div> BoP</div>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+  </div>
+
+  <div class="footer">v 1.0.3 | by Kawfia</div>
+</div>
+</body>
+</html>

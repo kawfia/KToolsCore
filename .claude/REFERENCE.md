@@ -40,7 +40,8 @@
 
 | Файл | Описание |
 |---|---|
-| `.claude/reference/KToolsAutoLoot.html` | Диаграмма интерфейса авто-лута |
+| `.claude/reference/autoloot_filter.html` | Макет окна фильтрации (категории, качество) |
+| `.claude/reference/autoloot_customlist.html` | Макет пользовательского списка предметов |
 | `.claude/reference/core.h` | ItemClass, ItemBonding, InventoryType (Legion 7.3.5) |
 | `.claude/reference/lib/` | Библиотеки (не коммитятся, копировать вручную) |
 | `.claude/reference/addons/` | Референсные аддоны |
