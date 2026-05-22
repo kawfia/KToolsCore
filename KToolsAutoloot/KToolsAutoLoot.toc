@@ -1,5 +1,5 @@
 ## Interface: 70300
-## Title: KTools AutoLoot
+## Title: |cfffc7e00KTools:|r AutoLoot
 ## Notes: Auto-loot with configurable rules
 ## Notes-ruRU: Авто-лут по настраиваемым правилам
 ## Author: kawfia
