@@ -3,7 +3,7 @@
 ## Notes: Modular addon core
 ## Notes-ruRU: Модульное ядро аддона
 ## Author: Kawfia
-## Version: 0.2.0
+## Version: 0.2.1
 ## SavedVariables: KToolsDB
 
 lib\load.xml
