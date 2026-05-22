@@ -37,7 +37,7 @@ function AutoLoot:Draw(container)
 
     local switchBtn = AceGUI:Create("Button")
     switchBtn:SetText(L["VIEW_CUSTOM"])
-    switchBtn:SetWidth(120)
+    switchBtn:SetWidth(240)
     switchBtn:SetCallback("OnClick", function()
         content:ReleaseChildren()
         if currentView == "quick" then
@@ -52,21 +52,11 @@ function AutoLoot:Draw(container)
     end)
     topRow:AddChild(switchBtn)
 
-    -- Ряд 2: экспорт, импорт, профиль, создать, удалить
+    -- Ряд 2: профиль, создать, удалить, [gap], импорт, экспорт
     local bottomRow = AceGUI:Create("SimpleGroup")
     bottomRow:SetLayout("Flow")
     bottomRow:SetFullWidth(true)
     header:AddChild(bottomRow)
-
-    local exportBtn = AceGUI:Create("Button")
-    exportBtn:SetText(L["EXPORT"])
-    exportBtn:SetWidth(90)
-    bottomRow:AddChild(exportBtn)
-
-    local importBtn = AceGUI:Create("Button")
-    importBtn:SetText(L["IMPORT"])
-    importBtn:SetWidth(90)
-    bottomRow:AddChild(importBtn)
 
     local profileDrop = AceGUI:Create("Dropdown")
     profileDrop:SetLabel(L["PROFILE"])
@@ -84,6 +74,21 @@ function AutoLoot:Draw(container)
     deleteDrop:SetWidth(120)
     deleteDrop:SetList({})
     bottomRow:AddChild(deleteDrop)
+
+    local spacer = AceGUI:Create("Label")
+    spacer:SetText("")
+    spacer:SetRelativeWidth(0.25)
+    bottomRow:AddChild(spacer)
+
+    local importBtn = AceGUI:Create("Button")
+    importBtn:SetText(L["IMPORT"])
+    importBtn:SetWidth(90)
+    bottomRow:AddChild(importBtn)
+
+    local exportBtn = AceGUI:Create("Button")
+    exportBtn:SetText(L["EXPORT"])
+    exportBtn:SetWidth(90)
+    bottomRow:AddChild(exportBtn)
 
     AutoLoot:DrawQuickSettings(content)
 end

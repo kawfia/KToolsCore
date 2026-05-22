@@ -19,14 +19,14 @@ local function extractId(text)
     return tonumber(text) or tonumber(string.match(text or "", "item:(%d+)"))
 end
 
-local function redrawList(listGroup)
-    listGroup:ReleaseChildren()
+local function redrawList(scrollFrame)
+    scrollFrame:ReleaseChildren()
     local cl = AutoLoot.db.profile.customList
 
     local hdr = AceGUI:Create("SimpleGroup")
     hdr:SetLayout("Flow")
     hdr:SetFullWidth(true)
-    listGroup:AddChild(hdr)
+    scrollFrame:AddChild(hdr)
 
     local hCollect = AceGUI:Create("Label")
     hCollect:SetText(L["CL_HDR_COLLECT"])
@@ -72,7 +72,7 @@ local function redrawList(listGroup)
             local row = AceGUI:Create("SimpleGroup")
             row:SetLayout("Flow")
             row:SetFullWidth(true)
-            listGroup:AddChild(row)
+            scrollFrame:AddChild(row)
 
             local chk = AceGUI:Create("CheckBox")
             chk:SetLabel("")
@@ -100,6 +100,7 @@ local function redrawList(listGroup)
 
             local ilvlBox = AceGUI:Create("EditBox")
             ilvlBox:SetLabel("")
+            ilvlBox:DisableButton(true)
             ilvlBox:SetText(entry.ilvl > 0 and tostring(entry.ilvl) or "")
             ilvlBox:SetWidth(55)
             ilvlBox:SetCallback("OnEnterPressed", function(_, _, val)
@@ -113,7 +114,7 @@ local function redrawList(listGroup)
             delBtn:SetWidth(35)
             delBtn:SetCallback("OnClick", function()
                 cl[id] = nil
-                redrawList(listGroup)
+                redrawList(scrollFrame)
             end)
             row:AddChild(delBtn)
         end
@@ -126,65 +127,86 @@ function AutoLoot:DrawCustomList(container)
 
     local cl = AutoLoot.db.profile.customList
 
-    local bar = AceGUI:Create("SimpleGroup")
-    bar:SetLayout("Flow")
-    bar:SetFullWidth(true)
-    container:AddChild(bar)
+    -- Секция добавления (InlineGroup — паттерн как в quick.lua)
+    local addGroup = AceGUI:Create("InlineGroup")
+    addGroup:SetTitle(L["CL_ADD_TITLE"])
+    addGroup:SetLayout("List")
+    addGroup:SetFullWidth(true)
+    container:AddChild(addGroup)
+
+    local addHdr = AceGUI:Create("SimpleGroup")
+    addHdr:SetLayout("Flow")
+    addHdr:SetFullWidth(true)
+    addGroup:AddChild(addHdr)
+
+    local aHFilter = AceGUI:Create("Label")
+    aHFilter:SetText("")
+    aHFilter:SetWidth(35)
+    addHdr:AddChild(aHFilter)
+
+    local aHId = AceGUI:Create("Label")
+    aHId:SetText(L["CL_HDR_ID"])
+    aHId:SetWidth(70)
+    addHdr:AddChild(aHId)
+
+    local aHItem = AceGUI:Create("Label")
+    aHItem:SetText(L["CL_HDR_ITEM"])
+    aHItem:SetRelativeWidth(0.55)
+    addHdr:AddChild(aHItem)
+
+    local aHIlvl = AceGUI:Create("Label")
+    aHIlvl:SetText(L["CL_HDR_ILVL"])
+    aHIlvl:SetWidth(55)
+    addHdr:AddChild(aHIlvl)
+
+    local aHBtn = AceGUI:Create("Label")
+    aHBtn:SetText("")
+    aHBtn:SetWidth(80)
+    addHdr:AddChild(aHBtn)
+
+    local addRow = AceGUI:Create("SimpleGroup")
+    addRow:SetLayout("Flow")
+    addRow:SetFullWidth(true)
+    addGroup:AddChild(addRow)
 
     local filterChk = AceGUI:Create("CheckBox")
     filterChk:SetLabel("")
     filterChk:SetWidth(35)
     filterChk:SetValue(false)
-    bar:AddChild(filterChk)
+    addRow:AddChild(filterChk)
 
     local idInput = AceGUI:Create("EditBox")
     idInput:SetLabel("")
+    idInput:DisableButton(true)
     idInput:SetWidth(70)
-    bar:AddChild(idInput)
+    addRow:AddChild(idInput)
 
     local nameInput = AceGUI:Create("EditBox")
     nameInput:SetLabel("")
-    nameInput:SetRelativeWidth(0.5)
-    bar:AddChild(nameInput)
+    nameInput:DisableButton(true)
+    nameInput:SetRelativeWidth(0.55)
+    addRow:AddChild(nameInput)
 
     local ilvlInput = AceGUI:Create("EditBox")
     ilvlInput:SetLabel("")
+    ilvlInput:DisableButton(true)
     ilvlInput:SetWidth(55)
-    bar:AddChild(ilvlInput)
+    addRow:AddChild(ilvlInput)
 
-    local addChk = AceGUI:Create("CheckBox")
-    addChk:SetLabel("")
-    addChk:SetWidth(35)
-    addChk:SetValue(false)
-    bar:AddChild(addChk)
+    local addBtn = AceGUI:Create("Button")
+    addBtn:SetText(L["CL_BTN_ADD"])
+    addBtn:SetWidth(80)
+    addRow:AddChild(addBtn)
 
-    local listGroup = AceGUI:Create("SimpleGroup")
-    listGroup:SetLayout("List")
-    listGroup:SetFullWidth(true)
-    container:AddChild(listGroup)
+    local scrollFrame = AceGUI:Create("ScrollFrame")
+    scrollFrame:SetLayout("List")
+    scrollFrame:SetFullWidth(true)
+    scrollFrame:SetHeight(280)
+    container:AddChild(scrollFrame)
 
-    filterChk:SetCallback("OnValueChanged", function(_, _, val)
-        filterByEnabled = val
-        redrawList(listGroup)
-    end)
-
-    -- ID field: принимает число или item-ссылку, автозаполняет Название
-    idInput:SetCallback("OnEnterPressed", function(_, _, val)
-        local id = extractId(val)
-        if id then
-            idInput:SetText(tostring(id))
-            local name = GetItemInfo(id)
-            if name then nameInput:SetText(name) end
-        end
-    end)
-
-    addChk:SetCallback("OnValueChanged", function(_, _, val)
-        if not val then return end
-        addChk:SetValue(false)
-
+    local function doAdd()
         local ilvl = tonumber(ilvlInput:GetText()) or 0
 
-        -- 1. ID field: число или ссылка
         local idNum = extractId(idInput:GetText())
         if idNum then
             if not cl[idNum] then
@@ -193,11 +215,10 @@ function AutoLoot:DrawCustomList(container)
             idInput:SetText("")
             nameInput:SetText("")
             ilvlInput:SetText("")
-            redrawList(listGroup)
+            redrawList(scrollFrame)
             return
         end
 
-        -- 2. Название field: ссылка → извлечь ID
         local nameText = nameInput:GetText()
         if nameText and nameText ~= "" then
             local linkedId = extractId(nameText)
@@ -208,11 +229,10 @@ function AutoLoot:DrawCustomList(container)
                 idInput:SetText("")
                 nameInput:SetText("")
                 ilvlInput:SetText("")
-                redrawList(listGroup)
+                redrawList(scrollFrame)
                 return
             end
 
-            -- 3. GetItemInfo(name) — только кэшированные предметы
             local _, link = GetItemInfo(nameText)
             if link then
                 local foundId = extractId(link)
@@ -221,13 +241,30 @@ function AutoLoot:DrawCustomList(container)
                     idInput:SetText("")
                     nameInput:SetText("")
                     ilvlInput:SetText("")
-                    redrawList(listGroup)
+                    redrawList(scrollFrame)
                     return
                 end
             end
             print(L["CL_ITEM_NOT_FOUND"] .. nameText)
         end
+    end
+
+    filterChk:SetCallback("OnValueChanged", function(_, _, val)
+        filterByEnabled = val
+        redrawList(scrollFrame)
     end)
 
-    redrawList(listGroup)
+    idInput:SetCallback("OnEnterPressed", function(_, _, val)
+        local id = extractId(val)
+        if id then
+            idInput:SetText(tostring(id))
+            local name = GetItemInfo(id)
+            if name then nameInput:SetText(name) end
+        end
+        doAdd()
+    end)
+
+    addBtn:SetCallback("OnClick", doAdd)
+
+    redrawList(scrollFrame)
 end
