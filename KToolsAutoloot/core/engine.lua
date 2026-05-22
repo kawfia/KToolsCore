@@ -24,6 +24,7 @@ local BIND_QUEST  = 4
 local skinningSpellName
 local lootOpen         = false
 local lootingContainer = false
+local containerPending = false
 
 local scanTooltip = CreateFrame("GameTooltip", "KToolsAutoLootScanTooltip", UIParent, "GameTooltipTemplate")
 scanTooltip:SetOwner(UIParent, "ANCHOR_NONE")
@@ -109,12 +110,13 @@ local function ShouldLoot(i, db)
 end
 
 function AutoLoot:ScanAndOpenContainer()
-    if lootOpen or InCombatLockdown() then return end
+    if lootOpen or containerPending or InCombatLockdown() then return end
     for bag = 0, 4 do
         for slot = 1, GetContainerNumSlots(bag) do
             local _, _, locked, _, _, lootable = GetContainerItemInfo(bag, slot)
             if lootable and not locked then
-                lootingContainer = true
+                lootingContainer  = true
+                containerPending  = true
                 UseContainerItem(bag, slot)
                 return
             end
@@ -123,7 +125,8 @@ function AutoLoot:ScanAndOpenContainer()
 end
 
 function AutoLoot:OnLootOpened()
-    lootOpen = true
+    containerPending = false
+    lootOpen         = true
     self:UnregisterEvent("LOOT_OPENED")
 
     local db = self.db.profile
@@ -146,7 +149,7 @@ end
 function AutoLoot:OnLootClosed()
     lootOpen         = false
     lootingContainer = false
-    if self.db.profile.options.autoOpen then
+    if self.db.profile.options.autoOpen and not containerPending then
         self:ScanAndOpenContainer()
     end
 end
@@ -182,6 +185,7 @@ function AutoLoot:EnableEngine()
 end
 
 function AutoLoot:DisableEngine()
+    containerPending = false
     self:UnregisterEvent("LOOT_READY")
     self:UnregisterEvent("LOOT_OPENED")
     self:UnregisterEvent("LOOT_CLOSED")

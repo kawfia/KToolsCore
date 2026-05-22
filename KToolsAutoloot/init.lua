@@ -43,6 +43,7 @@ end
 function AutoLoot:OnEnable()
     self:RegisterChatCommand("ktloot", "ShowModule")
     self:EnableEngine()
+    self:SetupBagButton()
 end
 
 function AutoLoot:OnDisable()
