@@ -85,17 +85,17 @@ function AutoLoot:Draw(container)
     newBox:SetLabel(L["PROFILE_NEW"])
     newBox:SetWidth(160)
     newBox:SetText(L["PROFILE_NEW_PLACEHOLDER"])
-    newBox.editBox:SetTextColor(0.5, 0.5, 0.5)
+    newBox.editbox:SetTextColor(0.5, 0.5, 0.5)
 
     local isPlaceholder = true
-    newBox.editBox:HookScript("OnEditFocusGained", function(self)
+    newBox.editbox:HookScript("OnEditFocusGained", function(self)
         if isPlaceholder then
             self:SetText("")
             self:SetTextColor(1, 1, 1)
             isPlaceholder = false
         end
     end)
-    newBox.editBox:HookScript("OnEditFocusLost", function(self)
+    newBox.editbox:HookScript("OnEditFocusLost", function(self)
         if self:GetText() == "" then
             self:SetText(L["PROFILE_NEW_PLACEHOLDER"])
             self:SetTextColor(0.5, 0.5, 0.5)
