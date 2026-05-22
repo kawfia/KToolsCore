@@ -41,6 +41,11 @@ end
 
 function AutoLoot:OnEnable()
     self:RegisterChatCommand("ktloot", "ShowModule")
+    self:EnableEngine()
+end
+
+function AutoLoot:OnDisable()
+    self:DisableEngine()
 end
 
 function AutoLoot:ShowModule()

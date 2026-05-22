@@ -42,7 +42,7 @@ function AutoLoot:Draw(container)
 
     local switchBtn = AceGUI:Create("Button")
     switchBtn:SetText(L["VIEW_CUSTOM"])
-    switchBtn:SetWidth(215)
+    switchBtn:SetWidth(200)
     switchBtn:SetCallback("OnClick", function()
         content:ReleaseChildren()
         if currentView == "quick" then
