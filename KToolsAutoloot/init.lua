@@ -29,6 +29,7 @@ local defaults = {
             bop       = false,
             skinning  = false,
             emptyLoot = false,
+            autoOpen  = false,
         },
     },
 }

@@ -116,7 +116,7 @@ local function redrawList(scrollFrame)
             row:AddChild(idLbl)
 
             local nameLbl = AceGUI:Create("Label")
-            nameLbl:SetText(name)
+            nameLbl:SetText(color .. name .. "|r")
             nameLbl:SetRelativeWidth(0.5)
             row:AddChild(nameLbl)
 

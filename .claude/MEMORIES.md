@@ -1,7 +1,7 @@
-[2026-05-22] KToolsAutoLoot core/engine.lua v0.1.9: реализован полный движок лута. LOOT_READY→LOOT_OPENED поток, ShouldLoot с OR-логикой (категории, матрица качества, customList), tooltip-scan для Artifact Power (ARTIFACT_POWER nil-guard), skinning через UnitCastingInfo+GetSpellInfo(8613), BoP через CONFIRM_LOOT_SLOT. EnableEngine/DisableEngine вызываются из OnEnable/OnDisable.
-[2026-05-22] KToolsAutoLoot core/load.xml + options.lua v0.1.7: load.xml подключает engine.lua и options.lua. options.lua: три toggle-опции (bop, skinning, emptyLoot), регистрация в AceConfig под родителем через KTools:GetOptionsName(). init.lua: добавлены defaults.profile.options={bop,skinning,emptyLoot}. Locale: OPT_BOP, OPT_SKINNING, OPT_EMPTY_LOOT.
-[2026-05-22] KTools/core/options.lua v0.1.12: добавлен KTools:GetOptionsName() — возвращает ADDON для использования модулями как parent в AddToBlizOptions.
-[2026-05-22] KToolsAutoLoot ui/main.lua v0.1.7: topRow — enabledChk=SetWidth(160), topSpacer=SetRelativeWidth(0.3), switchBtn=SetWidth(215). bottomRow разбит на два SimpleGroup: profileGroup(0.65) и actionGroup(0.35).
-[2026-05-22] KToolsAutoLoot ui/custom.lua v0.1.7: иконка качества InteractiveLabel+SetImage 16x16, GET_ITEM_INFO_RECEIVED с activeScrollFrame+onItemInfoReceived.
-[2026-05-22] KTools/core/ui.lua v0.2.0: RegisterModule поддерживает opts.label как приоритет над L[name].
-[2026-05-22] KToolsAutoLoot v0.1.4: X-ModuleName=AutoLoot в .toc, label читается через GetAddOnMetadata.
+[2026-05-22] KToolsAutoLoot engine.lua v0.2.1: авто-открытие контейнеров — опция autoOpen, LOOT_CLOSED→ScanAndOpenContainer (GetContainerItemInfo lootable=6й, UseContainerItem, InCombatLockdown guard). Флаг lootingContainer → лут всего без ShouldLoot. lootOpen флаг — защита от двойного открытия.
+[2026-05-22] KToolsAutoLoot ui/custom.lua: имена предметов окрашены в цвет редкости (color..name.."|r"), неизвестные серым |cff888888.
+[2026-05-22] KToolsAutoLoot core/engine.lua v0.1.9: реализован полный движок лута. LOOT_READY→LOOT_OPENED поток, ShouldLoot с OR-логикой (категории, матрица качества, customList), tooltip-scan для Artifact Power, skinning через UnitCastingInfo, BoP через CONFIRM_LOOT_SLOT.
+[2026-05-22] KToolsAutoLoot core/load.xml + options.lua: три toggle-опции (bop, skinning, emptyLoot), регистрация в AceConfig под KTools. KTools:GetOptionsName() возвращает ADDON.
+[2026-05-22] KToolsAutoLoot ui/main.lua: topRow enabledChk+switchBtn, bottomRow profileGroup(0.65)+actionGroup(0.35).
+[2026-05-22] KToolsAutoLoot ui/custom.lua v0.1.7: иконка качества InteractiveLabel+SetImage 16x16, GET_ITEM_INFO_RECEIVED с activeScrollFrame.
+[2026-05-22] KTools/core/ui.lua v0.2.0: RegisterModule поддерживает opts.label.

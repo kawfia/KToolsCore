@@ -42,6 +42,17 @@ local options = {
                 AutoLoot.db.profile.options.emptyLoot = val
             end,
         },
+        autoOpen = {
+            type  = "toggle",
+            name  = L["OPT_AUTO_OPEN"],
+            order = 4,
+            get = function()
+                return AutoLoot.db.profile.options.autoOpen
+            end,
+            set = function(_, val)
+                AutoLoot.db.profile.options.autoOpen = val
+            end,
+        },
     },
 }
 

@@ -22,6 +22,8 @@ local BIND_EQUIP  = 2
 local BIND_QUEST  = 4
 
 local skinningSpellName
+local lootOpen         = false
+local lootingContainer = false
 
 local scanTooltip = CreateFrame("GameTooltip", "KToolsAutoLootScanTooltip", UIParent, "GameTooltipTemplate")
 scanTooltip:SetOwner(UIParent, "ANCHOR_NONE")
@@ -106,7 +108,22 @@ local function ShouldLoot(i, db)
     return false
 end
 
+function AutoLoot:ScanAndOpenContainer()
+    if lootOpen or InCombatLockdown() then return end
+    for bag = 0, 4 do
+        for slot = 1, GetContainerNumSlots(bag) do
+            local _, _, locked, _, _, lootable = GetContainerItemInfo(bag, slot)
+            if lootable and not locked then
+                lootingContainer = true
+                UseContainerItem(bag, slot)
+                return
+            end
+        end
+    end
+end
+
 function AutoLoot:OnLootOpened()
+    lootOpen = true
     local db = self.db.profile
     local n  = GetNumLootItems()
 
@@ -119,12 +136,20 @@ function AutoLoot:OnLootOpened()
     end
 
     for i = n, 1, -1 do
-        if ShouldLoot(i, db) then
+        if lootingContainer or ShouldLoot(i, db) then
             LootSlot(i)
         end
     end
 
     self:UnregisterEvent("LOOT_OPENED")
+end
+
+function AutoLoot:OnLootClosed()
+    lootOpen         = false
+    lootingContainer = false
+    if self.db.profile.options.autoOpen then
+        self:ScanAndOpenContainer()
+    end
 end
 
 function AutoLoot:OnLootReady()
@@ -152,6 +177,7 @@ end
 
 function AutoLoot:EnableEngine()
     self:RegisterEvent("LOOT_READY",          "OnLootReady")
+    self:RegisterEvent("LOOT_CLOSED",         "OnLootClosed")
     self:RegisterEvent("CONFIRM_LOOT_SLOT",   "OnConfirmLootSlot")
     self:RegisterEvent("UNIT_SPELLCAST_START", "OnUnitSpellcastStart")
 end
@@ -159,6 +185,7 @@ end
 function AutoLoot:DisableEngine()
     self:UnregisterEvent("LOOT_READY")
     self:UnregisterEvent("LOOT_OPENED")
+    self:UnregisterEvent("LOOT_CLOSED")
     self:UnregisterEvent("CONFIRM_LOOT_SLOT")
     self:UnregisterEvent("UNIT_SPELLCAST_START")
 end
