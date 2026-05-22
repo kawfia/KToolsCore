@@ -22,3 +22,11 @@ local ldbObject = LDB:NewDataObject(ADDON, {
 function KTools:SetupMinimap()
     LibDBIcon:Register(ADDON, ldbObject, self.db.profile.minimap)
 end
+
+function KTools:SetMinimapVisible(visible)
+    if visible then
+        LibDBIcon:Show(ADDON)
+    else
+        LibDBIcon:Hide(ADDON)
+    end
+end
